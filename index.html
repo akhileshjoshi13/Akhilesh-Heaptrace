@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Client Engagement Risk Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --red: #C0392B;
+    --red-light: #FADBD8;
+    --amber: #D4860B;
+    --amber-light: #FDEBD0;
+    --green: #1A7A4A;
+    --green-light: #D5F5E3;
+    --navy: #0D1B2A;
+    --slate: #1C2B3A;
+    --ink: #1a1a2e;
+    --muted: #6B7A8D;
+    --border: #DDE3EA;
+    --bg: #F4F6F9;
+    --white: #FFFFFF;
+    --accent: #C0392B;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .report-header {
+    background: var(--navy);
+    padding: 48px 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .report-header::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 300px; height: 100%;
+    background: linear-gradient(135deg, transparent 60%, rgba(192,57,43,0.15));
+  }
+  .report-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--red), var(--amber), transparent);
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(192,57,43,0.2);
+    border: 1px solid rgba(192,57,43,0.4);
+    color: #F1948A;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    margin-bottom: 18px;
+  }
+  .badge-dot { width: 6px; height: 6px; background: #F1948A; border-radius: 50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .report-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .report-header .subtitle {
+    color: #8FA3B8;
+    font-size: 13px;
+    font-weight: 400;
+  }
+  .meta-row {
+    display: flex;
+    gap: 32px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .meta-item label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #5D7A93;
+    margin-bottom: 4px;
+  }
+  .meta-item span {
+    color: #CBD6E0;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* LAYOUT */
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 40px 60px; }
+
+  /* SECTION */
+  .section { margin-bottom: 36px; }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--slate);
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .icon {
+    width: 28px; height: 28px;
+    background: var(--navy);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+
+  /* RISK SUMMARY CARD */
+  .risk-summary-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--red);
+    border-radius: 6px;
+    padding: 24px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+  .summary-stat label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .summary-stat .value {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .summary-stat .value.red { color: var(--red); }
+  .summary-stat .value.amber { color: var(--amber); }
+  .summary-stat .value.green { color: var(--green); }
+  .summary-stat .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* RISK STATUS PILL */
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .pill.red { background: var(--red-light); color: var(--red); }
+  .pill.amber { background: var(--amber-light); color: var(--amber); }
+  .pill.green { background: var(--green-light); color: var(--green); }
+  .pill-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .pill.red .pill-dot { background: var(--red); }
+  .pill.amber .pill-dot { background: var(--amber); }
+  .pill.green .pill-dot { background: var(--green); }
+
+  /* TIMELINE */
+  .timeline-bar {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px 28px;
+  }
+  .timeline-track {
+    display: flex;
+    align-items: stretch;
+    height: 48px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 16px 0 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .track-seg {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: white;
+    flex: 1; padding: 0 12px; text-align: center;
+    letter-spacing: 0.5px;
+  }
+  .track-seg.safe { background: var(--green); }
+  .track-seg.warn { background: var(--amber); }
+  .track-seg.danger { background: var(--red); }
+  .timeline-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+  }
+  .timeline-note {
+    font-size: 12px; color: var(--muted);
+    margin-top: 8px;
+    background: var(--amber-light);
+    border-left: 3px solid var(--amber);
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* RESOURCE TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+  thead tr { background: var(--navy); }
+  thead th {
+    text-align: left;
+    padding: 12px 16px;
+    color: #8FA3B8;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #F9FAFB; }
+  tbody td { padding: 14px 16px; color: var(--ink); vertical-align: middle; }
+  .resource-name { font-weight: 600; }
+
+  /* RISK CARDS */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .risk-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .risk-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+  }
+  .risk-card.red::before { background: var(--red); }
+  .risk-card.amber::before { background: var(--amber); }
+  .risk-card.green::before { background: var(--green); }
+  .risk-card-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .risk-card h4 { font-size: 13px; font-weight: 600; color: var(--slate); }
+  .risk-card p { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+  /* ROOT CAUSE */
+  .cause-list { list-style: none; }
+  .cause-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .cause-num {
+    min-width: 28px; height: 28px;
+    background: var(--navy);
+    color: #8FA3B8;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .cause-item h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .cause-item p { font-size: 12px; color: var(--muted); }
+
+  /* MITIGATION TABLE */
+  .mitigation-row {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 2fr 3fr 1fr;
+    gap: 16px;
+    align-items: center;
+  }
+  .mitigation-row .risk-label { font-size: 12px; font-weight: 600; }
+  .mitigation-row .mit-action { font-size: 12px; color: var(--muted); }
+  .mitigation-row .priority {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; text-align: center;
+    padding: 4px 8px; border-radius: 3px;
+  }
+  .priority.high { background: var(--red-light); color: var(--red); }
+  .priority.med { background: var(--amber-light); color: var(--amber); }
+  .priority.low { background: var(--green-light); color: var(--green); }
+
+  /* ACTION PLAN */
+  .action-week {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .action-week-header {
+    background: var(--slate);
+    padding: 12px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .action-week-header h4 { color: var(--white); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; }
+  .action-week-header span { font-size: 10px; color: #8FA3B8; }
+  .action-items { padding: 14px 20px; }
+  .action-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .action-item:last-child { border-bottom: none; }
+  .action-check {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 3px; flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--green); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .action-check:hover { border-color: var(--green); background: var(--green-light); }
+  .action-item p { font-size: 12px; color: var(--ink); }
+  .action-item .owner {
+    font-size: 10px; color: var(--muted); margin-top: 2px;
+  }
+
+  /* PAULO AGENDA */
+  .agenda-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .agenda-header {
+    background: linear-gradient(135deg, var(--navy), var(--slate));
+    padding: 18px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .agenda-header h4 { color: var(--white); font-size: 14px; font-weight: 600; }
+  .agenda-header span { color: #8FA3B8; font-size: 11px; }
+  .agenda-points { padding: 16px 24px; }
+  .agenda-point {
+    display: flex; gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .agenda-point:last-child { border-bottom: none; }
+  .agenda-num {
+    min-width: 22px; height: 22px;
+    background: var(--amber-light); color: var(--amber);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+  }
+  .agenda-point p { font-size: 12px; color: var(--ink); }
+  .agenda-point .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* SAVE SECTION */
+  .save-card {
+    background: linear-gradient(135deg, var(--navy) 0%, #1A2F45 100%);
+    border-radius: 8px;
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .save-item { display: flex; gap: 14px; align-items: flex-start; }
+  .save-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .save-icon.red { background: rgba(192,57,43,0.2); }
+  .save-icon.green { background: rgba(26,122,74,0.2); }
+  .save-icon.amber { background: rgba(212,134,11,0.2); }
+  .save-item h4 { color: var(--white); font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .save-item p { font-size: 11px; color: #7A9AB5; line-height: 1.5; }
+
+  /* FOOTER */
+  .report-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .report-footer span { font-size: 11px; color: var(--muted); }
+
+  /* PRINT */
+  @media print {
+    body { background: white; }
+    .container { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="report-header">
+  <div class="badge"><div class="badge-dot"></div>Active Risk · Requires Immediate Attention</div>
+  <h1>Client Engagement Risk Report</h1>
+  <div class="subtitle">Delivery Management · Escalation & Risk Handling Document</div>
+  <div class="meta-row">
+    <div class="meta-item"><label>Report Date</label><span>May 19, 2025</span></div>
+    <div class="meta-item"><label>Risk Owner</label><span>Delivery Manager</span></div>
+    <div class="meta-item"><label>Risk Window</label><span>Post June 30, 2025</span></div>
+    <div class="meta-item"><label>Overall Risk Level</label><span style="color:#F1948A; font-weight:600;">🔴 HIGH</span></div>
+    <div class="meta-item"><label>Status</label><span>Under Active Management</span></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="section">
+    <div class="section-title">
+      <div class="icon">📋</div>
+      Executive Summary
+    </div>
+    <div class="risk-summary-card">
+      <div class="summary-stat">
+        <label>Client Engagement Status</label>
+        <div class="value red">Silent</div>
+        <div class="sub">No call attendance for 30+ days</div>
+      </div>
+      <div class="summary-stat">
+        <label>Current Delivery Health</label>
+        <div class="value green">Healthy</div>
+        <div class="sub">Good task pipeline through June</div>
+      </div>
+      <div class="summary-stat">
+        <label>Post-June Engagement</label>
+        <div class="value red">At Risk</div>
+        <div class="sub">No confirmation beyond June 30</div>
+      </div>
+    </div>
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:6px;padding:18px 24px;margin-top:14px;font-size:13px;color:#444;line-height:1.7;">
+      The client has not attended any Delivery or Management call for the past <strong>30+ days</strong>, communicating only via email with generic positive statements. Simultaneously, their product is experiencing a <strong>Go-To-Market failure</strong> — no customer acquisition. Current delivery by the team is healthy with tasks in the pipeline through June. However, the engagement for <strong>Prabhav and Aniruddha is confirmed only until June 30, 2025</strong>. Post that, there is no commitment or roadmap from the client, creating a high-risk scenario for resource continuity and contract renewal.
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="section">
+    <div class="section-title"><div class="icon">📅</div>Engagement Timeline & Risk Window</div>
+    <div class="timeline-bar">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600;">CURRENT ENGAGEMENT STATUS ACROSS TIME</div>
+      <div class="timeline-track">
+        <div class="track-seg safe">🟢 Now → May 30<br><span style="font-weight:400;font-size:10px;">Active Delivery</span></div>
+        <div class="track-seg warn">🟡 June 1 → June 30<br><span style="font-weight:400;font-size:10px;">Winding Down Risk</span></div>
+        <div class="track-seg danger">🔴 Post July 1<br><span style="font-weight:400;font-size:10px;">Engagement Cliff</span></div>
+      </div>
+      <div class="timeline-labels">
+        <span>Today</span>
+        <span>June 30 — Prabhav & Aniruddha Contract End</span>
+        <span>Uncertain →</span>
+      </div>
+      <div class="timeline-note">
+        ⚠️ <strong>Action Window: ~5–6 Weeks.</strong> If no re-engagement or renewal is confirmed by mid-June, Prabhav and Aniruddha will require internal reallocation. Vishal's engagement continues normally.
+      </div>
+    </div>
+  </div>
+
+  <!-- RESOURCE RISK -->
+  <div class="section">
+    <div class="section-title"><div class="icon">👥</div>Resource Risk Assessment</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Resource</th>
+          <th>Current Status</th>
+          <th>Engagement End</th>
+          <th>Post-June Risk</th>
+          <th>Mitigation Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="resource-name">Prabhav</div></td>
+          <td><span class="pill green"><span class="pill-dot"></span>Active</span></td>
+          <td><strong style="color:var(--amber)">June 30, 2025</strong></td>
+          <td><span class="pill red"><span class="pill-dot"></span>High Risk</span></td>
+          <td style="font-size:12px;color:var(--muted)">Internal scope being added · Discuss with Paulo</td>
+        </tr>
+        <tr>
+          <td><div class="resource-name">Aniruddha</div></td>
+          <td><span class="pill green"><span class="pill-dot"></span>Active</span></td>
+          <td><strong style="color:var(--amber)">June 30, 2025</strong></td>
+          <td><span class="pill red"><span class="pill-dot"></span>High Risk</span></td>
+          <td style="font-size:12px;color:var(--muted)">Internal scope being added · Discuss with Paulo</td>
+        </tr>
+        <tr>
+          <td><div class="resource-name">Vishal</div></td>
+          <td><span class="pill green"><span class="pill-dot"></span>Active</span></td>
+          <td><strong style="color:var(--green)">Ongoing</strong></td>
+          <td><span class="pill green"><span class="pill-dot"></span>Low Risk</span></td>
+          <td style="font-size:12px;color:var(--muted)">No action required at this time</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RISK IDENTIFICATION -->
+  <div class="section">
+    <div class="section-title"><div class="icon">⚠️</div>Risk Identification</div>
+    <div class="risk-grid">
+      <div class="risk-card red">
+        <div class="risk-card-header">
+          <h4>R1 — Contract Non-Renewal</h4>
+          <span class="pill red"><span class="pill-dot"></span>Critical</span>
+        </div>
+        <p>Client has not initiated any conversation regarding scope extension or renewal post June 30. With their product failing to acquire customers, budget prioritization is a high concern.</p>
+      </div>
+      <div class="risk-card red">
+        <div class="risk-card-header">
+          <h4>R2 — Stakeholder Disengagement</h4>
+          <span class="pill red"><span class="pill-dot"></span>Critical</span>
+        </div>
+        <p>30+ days of call avoidance is a pre-churn behavioral signal. Email-only communication masks the true client sentiment and prevents genuine risk assessment.</p>
+      </div>
+      <div class="risk-card amber">
+        <div class="risk-card-header">
+          <h4>R3 — Resource Bench Risk</h4>
+          <span class="pill amber"><span class="pill-dot"></span>High</span>
+        </div>
+        <p>Prabhav and Aniruddha face potential bench time from July 1 if no internal or client-side scope is confirmed. Revenue impact and morale impact are both at stake.</p>
+      </div>
+      <div class="risk-card amber">
+        <div class="risk-card-header">
+          <h4>R4 — GTM Failure Impact</h4>
+          <span class="pill amber"><span class="pill-dot"></span>High</span>
+        </div>
+        <p>Client's inability to acquire customers signals a deeper product-market or go-to-market problem. This may lead to internal cost cuts, delayed decisions, or project pivot that affects scope.</p>
+      </div>
+      <div class="risk-card amber">
+        <div class="risk-card-header">
+          <h4>R5 — Information Vacuum</h4>
+          <span class="pill amber"><span class="pill-dot"></span>Medium</span>
+        </div>
+        <p>No visibility into client's internal decisions, budget status, or strategic direction. Operating on email reassurances without live validation is operationally dangerous.</p>
+      </div>
+      <div class="risk-card amber">
+        <div class="risk-card-header">
+          <h4>R6 — Delayed Payment Risk</h4>
+          <span class="pill amber"><span class="pill-dot"></span>Medium</span>
+        </div>
+        <p>If client is facing cash flow pressure due to GTM failure, payment delays on upcoming invoices cannot be ruled out. Payment terms and milestones should be reviewed.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOT CAUSE ANALYSIS -->
+  <div class="section">
+    <div class="section-title"><div class="icon">🔍</div>Root Cause Analysis</div>
+    <ul class="cause-list">
+      <li class="cause-item">
+        <div class="cause-num">01</div>
+        <div>
+          <h4>Product-Market Fit Failure on Client Side</h4>
+          <p>The client's product is not gaining market traction. This is the primary root cause — when a product doesn't sell, founders and leadership become internally focused on fundraising, pivoting, or cost reduction. External engagements like development partnerships are the first to be deprioritized or cut.</p>
+        </div>
+      </li>
+      <li class="cause-item">
+        <div class="cause-num">02</div>
+        <div>
+          <h4>Avoidance Behavior Driven by Uncertainty</h4>
+          <p>The client is sending positive emails while avoiding live calls — a classic avoidance pattern. They may not yet have made a decision but are uncomfortable having a conversation they aren't ready for. The "everything is going good" emails are a delay tactic, not genuine status updates.</p>
+        </div>
+      </li>
+      <li class="cause-item">
+        <div class="cause-num">03</div>
+        <div>
+          <h4>Absence of Proactive Renewal Conversation</h4>
+          <p>There has been no formal discussion initiated (from either side) about scope, renewal, or post-June roadmap. In client engagements, silence on renewals almost always means the client is not planning one. This conversation should have been initiated 4–6 weeks ago.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- RISK & MITIGATION -->
+  <div class="section">
+    <div class="section-title"><div class="icon">🛡️</div>Risk & Mitigation Plan</div>
+    <div style="display:grid;grid-template-columns:80px 1fr 180px 140px;gap:0;background:var(--navy);border-radius:6px 6px 0 0;padding:10px 16px;">
+      <span style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#5D7A93;">Risk ID</span>
+      <span style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#5D7A93;">Mitigation Action</span>
+      <span style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#5D7A93;">Owner</span>
+      <span style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#5D7A93;">Priority</span>
+    </div>
+    <div style="border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;overflow:hidden;">
+      <div style="display:grid;grid-template-columns:80px 1fr 180px 140px;gap:0;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--white);">
+        <span style="font-size:12px;font-weight:700;color:var(--red)">R1</span>
+        <span style="font-size:12px;color:#444">Initiate renewal conversation this week via warm re-engagement email. Senior leadership to follow up within 5 days if no response.</span>
+        <span style="font-size:12px;color:var(--muted)">Delivery Manager + Senior Leadership</span>
+        <span><div class="priority high">Immediate</div></span>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 1fr 180px 140px;gap:0;padding:14px 16px;border-bottom:1px solid var(--border);background:#FAFBFC;">
+        <span style="font-size:12px;font-weight:700;color:var(--red)">R2</span>
+        <span style="font-size:12px;color:#444">Request a formal 30-min "Partnership Health Review" call. Frame it as value-add, not a chase. Break the email-only pattern with a direct but warm outreach.</span>
+        <span style="font-size:12px;color:var(--muted)">Delivery Manager</span>
+        <span><div class="priority high">This Week</div></span>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 1fr 180px 140px;gap:0;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--white);">
+        <span style="font-size:12px;font-weight:700;color:var(--amber)">R3</span>
+        <span style="font-size:12px;color:#444">Add Prabhav & Aniruddha to internal 6-month scope plan now. Discuss with Paulo next week to formalize allocation and prevent bench time post June.</span>
+        <span style="font-size:12px;color:var(--muted)">Delivery Manager + Paulo</span>
+        <span><div class="priority high">Next Week</div></span>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 1fr 180px 140px;gap:0;padding:14px 16px;border-bottom:1px solid var(--border);background:#FAFBFC;">
+        <span style="font-size:12px;font-weight:700;color:var(--amber)">R4</span>
+        <span style="font-size:12px;color:#444">During re-engagement call, understand client's GTM challenges. Propose how the team can pivot to support sales, marketing tech, or customer onboarding features — add value to their growth problem.</span>
+        <span style="font-size:12px;color:var(--muted)">Delivery Manager + Account Lead</span>
+        <span><div class="priority med">On Call</div></span>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 1fr 180px 140px;gap:0;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--white);">
+        <span style="font-size:12px;font-weight:700;color:var(--amber)">R5</span>
+        <span style="font-size:12px;color:#444">Resume weekly delivery calls with formal agenda and minutes. Establish structured governance to ensure visibility into client decisions going forward.</span>
+        <span style="font-size:12px;color:var(--muted)">Delivery Manager</span>
+        <span><div class="priority med">Post Call</div></span>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 1fr 180px 140px;gap:0;padding:14px 16px;background:#FAFBFC;">
+        <span style="font-size:12px;font-weight:700;color:var(--amber)">R6</span>
+        <span style="font-size:12px;color:#444">Review current invoice status and upcoming payment milestones. Flag finance team to monitor. Do not deliver scope without confirmed payment on previous milestones.</span>
+        <span style="font-size:12px;color:var(--muted)">Finance + Delivery Manager</span>
+        <span><div class="priority med">This Week</div></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DM ACTION PLAN -->
+  <div class="section">
+    <div class="section-title"><div class="icon">✅</div>Delivery Manager Action Plan</div>
+    <div class="action-week">
+      <div class="action-week-header">
+        <h4>WEEK 1 — Immediate Actions (This Week)</h4>
+        <span>May 19 – May 23</span>
+      </div>
+      <div class="action-items">
+        <div class="action-item">
+          <div class="action-check">✓</div>
+          <div>
+            <p>Flag this account as <strong>🔴 Red Risk</strong> internally and brief management</p>
+            <div class="owner">Owner: Delivery Manager</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <div class="action-check"></div>
+          <div>
+            <p>Draft and send warm re-engagement email — request a 30-min "Partnership Health Review" call</p>
+            <div class="owner">Owner: Delivery Manager</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <div class="action-check"></div>
+          <div>
+            <p>Review current invoice and payment milestone status with finance</p>
+            <div class="owner">Owner: Delivery Manager + Finance</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <div class="action-check"></div>
+          <div>
+            <p>Begin adding Prabhav & Aniruddha to internal 6-month scope planning document</p>
+            <div class="owner">Owner: Delivery Manager</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="action-week">
+      <div class="action-week-header">
+        <h4>WEEK 2 — Escalation & Paulo Discussion</h4>
+        <span>May 26 – May 30</span>
+      </div>
+      <div class="action-items">
+        <div class="action-item">
+          <div class="action-check"></div>
+          <div>
+            <p>If no call booked by May 23 — Senior leadership to reach out to client counterpart for peer-level touchpoint</p>
+            <div class="owner">Owner: Senior Leadership</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <div class="action-check"></div>
+          <div>
+            <p><strong>Discuss with Paulo</strong> — Confirm internal scope plan for Prabhav & Aniruddha for next 6 months post June</p>
+            <div class="owner">Owner: Delivery Manager + Paulo</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <div class="action-check"></div>
+          <div>
+            <p>Conduct Partnership Health Review call with client — read the room on budget, roadmap, and renewal intent</p>
+            <div class="owner">Owner: Delivery Manager + Account Lead</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="action-week">
+      <div class="action-week-header">
+        <h4>WEEK 3–4 — Renewal Drive or Transition</h4>
+        <span>June 1 – June 15</span>
+      </div>
+      <div class="action-items">
+        <div class="action-item">
+          <div class="action-check"></div>
+          <div>
+            <p>Based on call outcome — present a formal renewal proposal or confirm internal reallocation plan for both resources</p>
+            <div class="owner">Owner: Delivery Manager + Management</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <div class="action-check"></div>
+          <div>
+            <p>Resume structured weekly delivery cadence with client — agenda-driven, documented</p>
+            <div class="owner">Owner: Delivery Manager</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <div class="action-check"></div>
+          <div>
+            <p>Confirm Prabhav & Aniruddha allocation for July and beyond — no ambiguity for the team</p>
+            <div class="owner">Owner: Delivery Manager + Paulo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAULO DISCUSSION AGENDA -->
+  <div class="section">
+    <div class="section-title"><div class="icon">🤝</div>Paulo Discussion — Agenda Points (Next Week)</div>
+    <div class="agenda-card">
+      <div class="agenda-header">
+        <h4>Meeting: Resource Continuity Planning — Prabhav & Aniruddha</h4>
+        <span>Scheduled: Next Week</span>
+      </div>
+      <div class="agenda-points">
+        <div class="agenda-point">
+          <div class="agenda-num">1</div>
+          <div>
+            <p><strong>Context Brief:</strong> Client engagement risk for post-June, both resources currently confirmed only till June 30</p>
+            <div class="sub">Share this report as background before the meeting</div>
+          </div>
+        </div>
+        <div class="agenda-point">
+          <div class="agenda-num">2</div>
+          <div>
+            <p><strong>Internal Scope Confirmation:</strong> Present the 6-month internal scope plan — get Paulo's sign-off on allocation</p>
+            <div class="sub">Come with the scope document ready — don't leave the meeting without a decision</div>
+          </div>
+        </div>
+        <div class="agenda-point">
+          <div class="agenda-num">3</div>
+          <div>
+            <p><strong>Transition Planning:</strong> If client renews, what's the handoff plan? If not, which internal projects absorb these resources?</p>
+            <div class="sub">Both scenarios need a clear answer from this meeting</div>
+          </div>
+        </div>
+        <div class="agenda-point">
+          <div class="agenda-num">4</div>
+          <div>
+            <p><strong>Timeline Agreement:</strong> Agree on a decision deadline — latest by June 15 to give resources clarity and avoid last-minute scramble</p>
+            <div class="sub">Resource uncertainty beyond June 15 affects morale and planning</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW THIS SAVES US -->
+  <div class="section">
+    <div class="section-title"><div class="icon">💡</div>How Acting Now Saves the Engagement</div>
+    <div class="save-card">
+      <div class="save-item">
+        <div class="save-icon red">⏱️</div>
+        <div>
+          <h4>You Have a 5-Week Window</h4>
+          <p>Acting now gives you time to re-engage the client, present value, and negotiate a renewal before June 30 becomes a hard deadline with no options.</p>
+        </div>
+      </div>
+      <div class="save-item">
+        <div class="save-icon green">🔄</div>
+        <div>
+          <h4>Internal Scope as Safety Net</h4>
+          <p>Adding Prabhav & Aniruddha to internal scope now means zero bench time regardless of client decision. Zero revenue loss, zero morale impact.</p>
+        </div>
+      </div>
+      <div class="save-item">
+        <div class="save-icon amber">🤝</div>
+        <div>
+          <h4>Re-engagement Rebuilds Trust</h4>
+          <p>A well-framed outreach call — focused on their GTM challenge, not just your renewal — repositions Heaptrace as a strategic partner, not just a vendor.</p>
+        </div>
+      </div>
+      <div class="save-item">
+        <div class="save-icon green">📊</div>
+        <div>
+          <h4>Proactive Management = Credibility</h4>
+          <p>Presenting this risk to management before it becomes a crisis builds your credibility as a Delivery Manager. You saw it early and acted — that's leadership.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="report-footer">
+    <span>Heaptrace Technology · Delivery Risk Management</span>
+    <span>Prepared by: Delivery Manager · May 19, 2025 · Confidential — Internal Use Only</span>
+  </div>
+
+</div>
+</body>
+</html>
