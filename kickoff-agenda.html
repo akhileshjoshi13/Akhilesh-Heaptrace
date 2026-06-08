@@ -682,6 +682,7 @@
     <p class="modal-sub">Enter the client's email address to send them a formatted summary email with the PDF agenda attached.</p>
     <input type="email" id="modal-email" class="modal-input"
            placeholder="client@company.com" autocomplete="email"
+           oninput="this.classList.remove('error')"
            onkeydown="if(event.key==='Enter') confirmSendEmail()"/>
     <div class="modal-actions">
       <button class="modal-btn secondary" id="modal-save-only-btn" onclick="saveOnly()">Save only</button>
@@ -1156,7 +1157,7 @@
     const noRes = document.getElementById('sidebar-no-results');
     noRes.style.display = (hits === 0 && query) ? '' : 'none';
     noRes.textContent   = `No clients match "${q}"`;
-    document.getElementById('search-clear').style.display = q ? '' : 'none';
+    document.getElementById('search-clear').style.display = q ? 'block' : 'none';
   }
 
   function clearSearch() {

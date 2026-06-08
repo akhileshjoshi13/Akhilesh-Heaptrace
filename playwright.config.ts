@@ -6,9 +6,15 @@ export default defineConfig({
   retries: 1,
   reporter: [['html', { open: 'never' }], ['list']],
 
+  webServer: {
+    command: 'npx serve . --listen 4321 --no-clipboard',
+    url: 'http://localhost:4321',
+    reuseExistingServer: !process.env.CI,
+    timeout: 15000,
+  },
+
   use: {
-    // Runs against live GitHub Pages; swap to 'http://localhost:PORT' for local dev
-    baseURL: 'https://akhileshjoshi13.github.io/Akhilesh-Heaptrace',
+    baseURL: 'http://localhost:4321',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',
