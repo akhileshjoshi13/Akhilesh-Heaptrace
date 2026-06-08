@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kickoff Meeting Agenda — Heaptrace</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
@@ -467,6 +468,48 @@
       align-items: center;
       gap: 8px;
     }
+
+    /* Client picker dropdown */
+    .client-picker {
+      height: 36px;
+      padding: 0 30px 0 14px;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.09)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")
+        no-repeat right 11px center;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      min-width: 148px;
+      transition: background-color 0.15s;
+    }
+    .client-picker:hover { background-color: rgba(255,255,255,0.15); }
+    .client-picker option { background: #1e1a3a; color: #fff; }
+
+    /* Save to DB button */
+    .save-db-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .save-db-btn:hover { background: rgba(255,255,255,0.22); transform: scale(1.08); }
+    .save-db-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
     .download-btn {
       display: inline-flex;
       align-items: center;
@@ -614,6 +657,18 @@
       </div>
       <div class="btn-row">
         <div class="badge"><div class="badge-dot"></div>Client Kickoff</div>
+
+        <!-- Load saved client -->
+        <select id="client-picker" class="client-picker" title="Load saved client" onchange="loadClientData(this.value)">
+          <option value="">Load client…</option>
+        </select>
+
+        <!-- Save to Supabase -->
+        <button class="save-db-btn" id="save-db-btn" onclick="saveToDatabase()" title="Save to Database">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        </button>
+
+        <!-- Download PDF -->
         <button class="download-btn" id="download-btn" onclick="downloadPDF()" title="Download PDF">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
@@ -945,6 +1000,120 @@
 <script>
   document.getElementById('footer-year').textContent = new Date().getFullYear();
 
+  // ── Supabase ─────────────────────────────────────────────────────────────
+  const SUPABASE_URL  = 'https://ohlipdsngaziclitcrkd.supabase.co';
+  const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9obGlwZHNuZ2F6aWNsaXRjcmtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MTI2NjIsImV4cCI6MjA5NjQ4ODY2Mn0.chaxmkpe__LwpnG3vgKKD1T0jkDd-YM4H5TQX9npw74';
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Collect all field values into a DB payload object
+  function getPayload() {
+    return {
+      client_name:      document.getElementById('meta-client').value.trim(),
+      meeting_date:     document.getElementById('meta-date').value || null,
+      engagement_type:  document.getElementById('meta-engagement').value || null,
+      access_cloud:     document.getElementById('access-cloud').value,
+      access_vcs:       document.getElementById('access-vcs').value,
+      access_pm:        document.getElementById('access-pm').value,
+      access_comms:     document.getElementById('access-comms').value,
+      access_additional:document.getElementById('access-additional').value,
+      call_frequency:   document.getElementById('call-frequency').value,
+      call_days:        document.getElementById('call-days').value,
+      call_time:        document.getElementById('call-time').value,
+      call_timezone:    document.getElementById('call-timezone').value,
+      priority_1:       document.getElementById('priority-1').value,
+      priority_2:       document.getElementById('priority-2').value,
+      priority_3:       document.getElementById('priority-3').value,
+      notes_aob:        document.getElementById('notes-aob').value,
+      updated_at:       new Date().toISOString()
+    };
+  }
+
+  async function saveToDatabase() {
+    const payload = getPayload();
+    if (!payload.client_name) { showToast('Enter a client name first'); return; }
+
+    const btn = document.getElementById('save-db-btn');
+    btn.disabled = true;
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+
+    const { error } = await db
+      .from('kickoff_meetings')
+      .upsert(payload, { onConflict: 'client_name' });
+
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>`;
+
+    if (error) {
+      showToast('Save failed — ' + error.message);
+      console.error('Supabase save error:', error);
+    } else {
+      showToast('Saved to database ✓');
+      saveAgenda(); // also update localStorage
+      await refreshClientPicker(payload.client_name);
+    }
+  }
+
+  async function refreshClientPicker(keepSelected) {
+    const { data } = await db
+      .from('kickoff_meetings')
+      .select('client_name, updated_at')
+      .order('updated_at', { ascending: false });
+
+    const picker = document.getElementById('client-picker');
+    while (picker.options.length > 1) picker.remove(1);
+
+    if (data && data.length > 0) {
+      data.forEach(row => {
+        const opt = document.createElement('option');
+        opt.value = row.client_name;
+        opt.textContent = row.client_name;
+        picker.appendChild(opt);
+      });
+    }
+    if (keepSelected) picker.value = keepSelected;
+  }
+
+  async function loadClientData(clientName) {
+    if (!clientName) return;
+
+    const { data, error } = await db
+      .from('kickoff_meetings')
+      .select('*')
+      .eq('client_name', clientName)
+      .single();
+
+    if (error || !data) { showToast('Could not load client data'); return; }
+
+    const map = {
+      'meta-client':      data.client_name,
+      'meta-date':        data.meeting_date   || '',
+      'meta-engagement':  data.engagement_type|| '',
+      'access-cloud':     data.access_cloud   || '',
+      'access-vcs':       data.access_vcs     || '',
+      'access-pm':        data.access_pm      || '',
+      'access-comms':     data.access_comms   || '',
+      'access-additional':data.access_additional || '',
+      'call-frequency':   data.call_frequency || '',
+      'call-days':        data.call_days      || '',
+      'call-time':        data.call_time      || '',
+      'call-timezone':    data.call_timezone  || '',
+      'priority-1':       data.priority_1     || '',
+      'priority-2':       data.priority_2     || '',
+      'priority-3':       data.priority_3     || '',
+      'notes-aob':        data.notes_aob      || ''
+    };
+
+    Object.entries(map).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    });
+
+    // Restore visual chip states
+    restoreFreqChips();
+    showToast('Loaded: ' + clientName);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   const STORAGE_KEY = 'heaptrace_kickoff_agenda_v1';
 
   const FIELDS = [
@@ -1185,8 +1354,11 @@
   // Auto-save every 60 seconds
   setInterval(saveAgenda, 60000);
 
-  // Load saved data on page ready
-  document.addEventListener('DOMContentLoaded', loadAgenda);
+  // Load saved data and client list on page ready
+  document.addEventListener('DOMContentLoaded', () => {
+    loadAgenda();
+    refreshClientPicker();
+  });
 </script>
 </body>
 </html>
