@@ -25,6 +25,7 @@
       --text-light: #9CA3AF;
       --radius:     14px;
       --shadow:     0 2px 16px rgba(17,14,39,0.08);
+      --sidebar-w:  256px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -52,7 +53,7 @@
       pointer-events: none;
     }
     .header-inner {
-      max-width: 900px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 36px 32px 32px;
       position: relative;
@@ -105,7 +106,6 @@
       font-weight: 400;
     }
 
-    /* Meta bar inside header */
     .meta-bar {
       display: flex;
       flex-wrap: wrap;
@@ -165,10 +165,237 @@
       background: var(--ht-grad-h);
     }
 
+    /* ══════════════ APP LAYOUT ══════════════ */
+    .app-layout {
+      display: flex;
+      align-items: flex-start;
+      min-height: calc(100vh - 180px);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--ht-dark);
+      border-right: 1px solid rgba(255,255,255,0.07);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      transition: width 0.32s cubic-bezier(0.4,0,0.2,1),
+                  min-width 0.32s cubic-bezier(0.4,0,0.2,1);
+      z-index: 50;
+    }
+    .sidebar.collapsed {
+      width: 0;
+      min-width: 0;
+    }
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(180,48,114,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .sidebar-inner {
+      width: var(--sidebar-w);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar header row */
+    .sidebar-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 14px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .sidebar-ttl {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.35);
+    }
+    .sidebar-close-btn {
+      width: 26px; height: 26px;
+      border-radius: 7px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.4);
+      transition: background 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+    .sidebar-close-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* New meeting button */
+    .new-mtg-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: calc(100% - 20px);
+      margin: 12px 10px 8px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1.5px dashed rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.65);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .new-mtg-btn:hover {
+      border-color: var(--ht-orange);
+      background: rgba(242,113,33,0.08);
+      color: #fff;
+    }
+
+    /* Client list */
+    .client-list-wrap {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 4px 0 20px;
+    }
+    .client-list-wrap::-webkit-scrollbar { width: 4px; }
+    .client-list-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.25);
+      padding: 10px 14px 6px;
+    }
+
+    .client-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .client-item:hover { background: rgba(255,255,255,0.05); }
+    .client-item.active {
+      background: rgba(242,113,33,0.1);
+      border-left-color: var(--ht-orange);
+    }
+    .client-avatar {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      background: var(--ht-grad);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .client-item-info { flex: 1; min-width: 0; }
+    .client-item-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .client-item-date {
+      font-size: 11px;
+      color: rgba(255,255,255,0.28);
+      margin-top: 1px;
+    }
+
+    /* Sidebar empty state */
+    .sidebar-empty {
+      padding: 24px 14px;
+      text-align: center;
+    }
+    .sidebar-empty-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+    .sidebar-empty-text {
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      line-height: 1.6;
+    }
+
+    /* ── MAIN AREA ── */
+    .main-area {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top bar inside main area */
+    .main-topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px 0;
+    }
+    .panel-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 11px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      box-shadow: 0 1px 4px rgba(17,14,39,0.06);
+      white-space: nowrap;
+    }
+    .panel-toggle-btn:hover {
+      border-color: var(--ht-purple);
+      color: var(--ht-purple);
+      background: rgba(180,48,114,0.04);
+    }
+    .active-client-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      box-shadow: 0 1px 4px rgba(17,14,39,0.06);
+    }
+    .active-client-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--ht-grad-h);
+      flex-shrink: 0;
+    }
+
     /* ── CONTENT ── */
     .content {
       max-width: 900px;
-      margin: 32px auto;
+      margin: 24px auto;
       padding: 0 32px 60px;
       display: flex;
       flex-direction: column;
@@ -469,28 +696,22 @@
       gap: 8px;
     }
 
-    /* Client picker dropdown */
-    .client-picker {
-      height: 36px;
-      padding: 0 30px 0 14px;
-      border-radius: 100px;
+    /* Sidebar toggle (header) */
+    .sidebar-toggle-hdr {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.1);
       border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.09)
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")
-        no-repeat right 11px center;
       color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
       cursor: pointer;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      min-width: 148px;
-      transition: background-color 0.15s;
+      transition: background 0.18s, transform 0.15s;
+      flex-shrink: 0;
     }
-    .client-picker:hover { background-color: rgba(255,255,255,0.15); }
-    .client-picker option { background: #1e1a3a; color: #fff; }
+    .sidebar-toggle-hdr:hover { background: rgba(255,255,255,0.22); }
 
     /* Save to DB button */
     .save-db-btn {
@@ -590,13 +811,20 @@
     @media print {
       body { background: #fff; }
       .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
-      .download-btn, .save-btn, .btn-row { display: none !important; }
+      .download-btn, .save-btn, .btn-row, .sidebar, .main-topbar { display: none !important; }
       .header::before { display: none; }
       .meta-select { color: #000; }
       input, textarea { color: #000 !important; }
+      .app-layout { display: block; }
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        height: 100vh;
+        z-index: 200;
+      }
+      .sidebar.collapsed { width: 0; min-width: 0; }
       .header-inner { padding: 24px 18px 20px; }
       .content { padding: 0 18px 48px; }
       .tool-grid, .schedule-grid { grid-template-columns: 1fr; }
@@ -604,6 +832,7 @@
       .meta-bar { gap: 8px; }
       .meta-field { min-width: 140px; }
       .btn-row { flex-wrap: wrap; }
+      .main-topbar { padding: 14px 18px 0; }
     }
   </style>
 </head>
@@ -658,10 +887,10 @@
       <div class="btn-row">
         <div class="badge"><div class="badge-dot"></div>Client Kickoff</div>
 
-        <!-- Load saved client -->
-        <select id="client-picker" class="client-picker" title="Load saved client" onchange="loadClientData(this.value)">
-          <option value="">Load client…</option>
-        </select>
+        <!-- Sidebar toggle -->
+        <button class="sidebar-toggle-hdr" id="sidebar-toggle-hdr" onclick="toggleSidebar()" title="Toggle client panel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+        </button>
 
         <!-- Save to Supabase -->
         <button class="save-db-btn" id="save-db-btn" onclick="saveToDatabase()" title="Save to Database">
@@ -707,289 +936,336 @@
 </div>
 <div class="grad-bar"></div>
 
-<!-- ═══════════════ CONTENT ═══════════════ -->
-<div class="content" id="agenda-content">
+<!-- ═══════════════ APP LAYOUT ═══════════════ -->
+<div class="app-layout">
 
-  <!-- ── 1. Welcome & Team Introductions ── -->
-  <div class="card">
-    <div class="card-header">
-      <div class="section-num">1</div>
-      <div>
-        <div class="card-title">Welcome &amp; Team Introductions</div>
-        <div class="card-subtitle">Setting the tone and building rapport</div>
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+      <!-- Sidebar header -->
+      <div class="sidebar-hd">
+        <span class="sidebar-ttl">Clients</span>
+        <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Collapse panel">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
       </div>
-    </div>
-    <div class="card-body">
-      <div class="item-list">
-        <div class="item">
-          <div class="item-icon">🙌</div>
-          <div class="item-content">
-            <div class="item-label">Heaptrace Team</div>
-            <div class="item-desc">Director of Sales · Director of Engineering · Delivery Manager · Execution &amp; Delivery Team</div>
-          </div>
-        </div>
-        <div class="item">
-          <div class="item-icon">🤝</div>
-          <div class="item-content">
-            <div class="item-label">Client Team</div>
-            <div class="item-desc">Attendees introduce themselves — name, role, and involvement. Confirm the primary point of contact (POC) for day-to-day communication.</div>
-          </div>
-        </div>
-        <div class="item">
-          <div class="item-icon">🎯</div>
-          <div class="item-content">
-            <div class="item-label">Meeting Objective</div>
-            <div class="item-desc">Align on project goals, confirm access and tools, agree on communication cadence, and lock in the immediate focus areas.</div>
-          </div>
+
+      <!-- New meeting button -->
+      <button class="new-mtg-btn" onclick="newMeeting()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Meeting
+      </button>
+
+      <!-- Client list -->
+      <div class="client-list-wrap">
+        <div class="sidebar-section-label">Saved Meetings</div>
+        <div id="client-list">
+          <!-- populated by JS -->
         </div>
       </div>
     </div>
-  </div>
+  </aside>
 
-  <!-- ── 2. Project Access Setup ── -->
-  <div class="card">
-    <div class="card-header">
-      <div class="section-num">2</div>
-      <div>
-        <div class="card-title">Project Access Setup</div>
-        <div class="card-subtitle">Confirm accounts, repos, and tool access</div>
+  <!-- ── MAIN AREA ── -->
+  <div class="main-area">
+
+    <!-- Top bar with active client indicator -->
+    <div class="main-topbar" id="main-topbar">
+      <button class="panel-toggle-btn" onclick="toggleSidebar()" id="panel-toggle-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+        Clients
+      </button>
+      <div class="active-client-tag" id="active-client-tag" style="display:none;">
+        <div class="active-client-dot"></div>
+        <span id="active-client-name">—</span>
       </div>
     </div>
-    <div class="card-body">
-      <div class="tool-grid">
-        <div class="tool-card">
-          <div class="tool-card-header">
-            <span class="tool-emoji">☁️</span>
-            <span class="tool-name">Cloud Platform</span>
-          </div>
-          <div class="tool-field">
-            <input id="access-cloud" type="text" placeholder="AWS / GCP / Azure / Oracle / Other" />
-          </div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-card-header">
-            <span class="tool-emoji">🗂️</span>
-            <span class="tool-name">Source Control</span>
-          </div>
-          <div class="tool-field">
-            <input id="access-vcs" type="text" placeholder="GitHub / GitLab / Bitbucket / Other" />
-          </div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-card-header">
-            <span class="tool-emoji">📋</span>
-            <span class="tool-name">Project Management</span>
-          </div>
-          <div class="tool-field">
-            <input id="access-pm" type="text" placeholder="Jira / Asana / Linear / ClickUp / Other" />
-          </div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-card-header">
-            <span class="tool-emoji">💬</span>
-            <span class="tool-name">Communication</span>
-          </div>
-          <div class="tool-field">
-            <input id="access-comms" type="text" placeholder="Slack / Teams / Google Chat / Other" />
-          </div>
-        </div>
-      </div>
-      <div style="margin-top:12px;">
-        <div class="input-item" style="align-items:flex-start;">
-          <div class="input-icon">➕</div>
-          <div class="input-group">
-            <label>Additional Access / Tools Required</label>
-            <textarea id="access-additional" class="notes-area" placeholder="Any other tools, VPNs, environments, or credentials that need to be set up..." rows="2"></textarea>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- ── 3. Communication & Call Protocol ── -->
-  <div class="card">
-    <div class="card-header">
-      <div class="section-num">3</div>
-      <div>
-        <div class="card-title">Communication &amp; Call Protocol</div>
-        <div class="card-subtitle">Cadence, schedule, and working hours agreement</div>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="item-list">
-        <div class="item">
-          <div class="item-icon">📞</div>
-          <div class="item-content">
-            <div class="item-label">Call Cadence</div>
-            <div class="item-desc">Agree on preferred days, times, and how often the team syncs each week.</div>
+    <!-- ═══════════════ CONTENT ═══════════════ -->
+    <div class="content" id="agenda-content">
+
+      <!-- ── 1. Welcome & Team Introductions ── -->
+      <div class="card">
+        <div class="card-header">
+          <div class="section-num">1</div>
+          <div>
+            <div class="card-title">Welcome &amp; Team Introductions</div>
+            <div class="card-subtitle">Setting the tone and building rapport</div>
           </div>
         </div>
-
-        <!-- Call frequency chips -->
-        <div class="input-item" style="align-items:flex-start;">
-          <div class="input-icon" style="margin-top:2px;">🔁</div>
-          <div class="input-group">
-            <label>Call Frequency per Week</label>
-            <div class="freq-chips" id="freq-chips">
-              <button type="button" class="freq-chip" data-value="1× per week">1× / week</button>
-              <button type="button" class="freq-chip" data-value="2× per week">2× / week</button>
-              <button type="button" class="freq-chip" data-value="3× per week">3× / week</button>
-              <button type="button" class="freq-chip" data-value="4× per week">4× / week</button>
-              <button type="button" class="freq-chip" data-value="Daily (5× per week)">Daily</button>
-              <button type="button" class="freq-chip" data-value="As needed / Ad hoc">Ad hoc</button>
-            </div>
-            <input type="hidden" id="call-frequency" />
-
-            <!-- Days selector — appears after frequency is picked -->
-            <div class="freq-days-section" id="freq-days-section">
-              <div class="freq-days-hint" id="freq-days-hint">Select days</div>
-              <div class="freq-chips" id="day-chips">
-                <button type="button" class="freq-chip" data-value="Mon">Mon</button>
-                <button type="button" class="freq-chip" data-value="Tue">Tue</button>
-                <button type="button" class="freq-chip" data-value="Wed">Wed</button>
-                <button type="button" class="freq-chip" data-value="Thu">Thu</button>
-                <button type="button" class="freq-chip" data-value="Fri">Fri</button>
-                <button type="button" class="freq-chip" data-value="Sat">Sat</button>
-                <button type="button" class="freq-chip" data-value="Sun">Sun</button>
+        <div class="card-body">
+          <div class="item-list">
+            <div class="item">
+              <div class="item-icon">🙌</div>
+              <div class="item-content">
+                <div class="item-label">Heaptrace Team</div>
+                <div class="item-desc">Director of Sales · Director of Engineering · Delivery Manager · Execution &amp; Delivery Team</div>
               </div>
-              <input type="hidden" id="call-days" />
+            </div>
+            <div class="item">
+              <div class="item-icon">🤝</div>
+              <div class="item-content">
+                <div class="item-label">Client Team</div>
+                <div class="item-desc">Attendees introduce themselves — name, role, and involvement. Confirm the primary point of contact (POC) for day-to-day communication.</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="item-icon">🎯</div>
+              <div class="item-content">
+                <div class="item-label">Meeting Objective</div>
+                <div class="item-desc">Align on project goals, confirm access and tools, agree on communication cadence, and lock in the immediate focus areas.</div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Call Time & Time Zone -->
-        <div class="input-item">
-          <div class="input-icon">🕐</div>
-          <div class="input-group" style="display:flex; gap:20px;">
-            <div style="flex:1;">
-              <label>Call Time</label>
-              <input id="call-time" type="text" placeholder="e.g. 10:00 AM" />
+      <!-- ── 2. Project Access Setup ── -->
+      <div class="card">
+        <div class="card-header">
+          <div class="section-num">2</div>
+          <div>
+            <div class="card-title">Project Access Setup</div>
+            <div class="card-subtitle">Confirm accounts, repos, and tool access</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="tool-grid">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <span class="tool-emoji">☁️</span>
+                <span class="tool-name">Cloud Platform</span>
+              </div>
+              <div class="tool-field">
+                <input id="access-cloud" type="text" placeholder="AWS / GCP / Azure / Oracle / Other" />
+              </div>
             </div>
-            <div style="flex:1; border-left:1px solid var(--border); padding-left:20px;">
-              <label>Time Zone</label>
-              <input id="call-timezone" type="text" placeholder="e.g. IST / EST / UTC+5:30" />
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <span class="tool-emoji">🗂️</span>
+                <span class="tool-name">Source Control</span>
+              </div>
+              <div class="tool-field">
+                <input id="access-vcs" type="text" placeholder="GitHub / GitLab / Bitbucket / Other" />
+              </div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <span class="tool-emoji">📋</span>
+                <span class="tool-name">Project Management</span>
+              </div>
+              <div class="tool-field">
+                <input id="access-pm" type="text" placeholder="Jira / Asana / Linear / ClickUp / Other" />
+              </div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <span class="tool-emoji">💬</span>
+                <span class="tool-name">Communication</span>
+              </div>
+              <div class="tool-field">
+                <input id="access-comms" type="text" placeholder="Slack / Teams / Google Chat / Other" />
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="input-item" style="align-items:flex-start;">
+              <div class="input-icon">➕</div>
+              <div class="input-group">
+                <label>Additional Access / Tools Required</label>
+                <textarea id="access-additional" class="notes-area" placeholder="Any other tools, VPNs, environments, or credentials that need to be set up..." rows="2"></textarea>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="item">
-          <div class="item-icon">📢</div>
-          <div class="item-content">
-            <div class="item-label">Daily Work Updates</div>
-            <div class="item-desc">Work updates will be shared on the Communication channel on a daily basis to keep all stakeholders informed of progress.</div>
+      <!-- ── 3. Communication & Call Protocol ── -->
+      <div class="card">
+        <div class="card-header">
+          <div class="section-num">3</div>
+          <div>
+            <div class="card-title">Communication &amp; Call Protocol</div>
+            <div class="card-subtitle">Cadence, schedule, and working hours agreement</div>
           </div>
         </div>
-        <div class="item">
-          <div class="item-icon">📋</div>
-          <div class="item-content">
-            <div class="item-label">Meeting Format</div>
-            <div class="item-desc">Agree on structure — standing agenda, who runs the call, and how action items will be tracked and followed up.</div>
-          </div>
-        </div>
-        <div class="item">
-          <div class="item-icon">📊</div>
-          <div class="item-content">
-            <div class="item-label">Delivery Review — 2× Monthly (Delivery Manager)</div>
-            <div class="item-desc">Bi-monthly check-in led by the Delivery Manager to review overall delivery health, progress, and client feedback.</div>
-          </div>
-        </div>
-        <div class="item">
-          <div class="item-icon">🤝</div>
-          <div class="item-content">
-            <div class="item-label">Management Sync — Monthly (Director of Engineering &amp; Director of Sales)</div>
-            <div class="item-desc">Monthly leadership call to discuss overall satisfaction, concerns, areas of improvement, and any new opportunities for collaboration.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div class="card-body">
+          <div class="item-list">
+            <div class="item">
+              <div class="item-icon">📞</div>
+              <div class="item-content">
+                <div class="item-label">Call Cadence</div>
+                <div class="item-desc">Agree on preferred days, times, and how often the team syncs each week.</div>
+              </div>
+            </div>
 
-  <!-- ── 4. Escalation Path ── -->
-  <div class="card">
-    <div class="card-header">
-      <div class="section-num">4</div>
-      <div>
-        <div class="card-title">Escalation Path</div>
-        <div class="card-subtitle">Who to reach out to when you need support</div>
-      </div>
-    </div>
-    <div class="card-body">
-      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px;">
-        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-light); margin-bottom:12px;">Heaptrace Escalation Path</div>
-        <div style="display:flex; align-items:center; gap:0;">
-          <div style="flex:1; background:#fff; border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
-            <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--ht-purple); margin-bottom:4px;">Level 1</div>
-            <div style="font-size:13px; font-weight:700; color:var(--text-main);">Delivery Manager</div>
-            <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">First point of escalation for any delivery, timeline, or team concerns</div>
-          </div>
-          <div style="padding:0 10px; flex-shrink:0;">
-            <svg width="28" height="16" viewBox="0 0 28 16" fill="none">
-              <path d="M0 8H24M24 8L17 2M24 8L17 14" stroke="url(#esc-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <defs>
-                <linearGradient id="esc-grad" x1="0" y1="8" x2="28" y2="8" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#F27121"/><stop offset="1" stop-color="#8A2387"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <div style="flex:1; background:#fff; border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
-            <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--ht-orange); margin-bottom:4px;">Level 2</div>
-            <div style="font-size:13px; font-weight:700; color:var(--text-main);">Director of Sales</div>
-            <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Senior escalation for commercial, strategic, or unresolved delivery issues</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+            <!-- Call frequency chips -->
+            <div class="input-item" style="align-items:flex-start;">
+              <div class="input-icon" style="margin-top:2px;">🔁</div>
+              <div class="input-group">
+                <label>Call Frequency per Week</label>
+                <div class="freq-chips" id="freq-chips">
+                  <button type="button" class="freq-chip" data-value="1× per week">1× / week</button>
+                  <button type="button" class="freq-chip" data-value="2× per week">2× / week</button>
+                  <button type="button" class="freq-chip" data-value="3× per week">3× / week</button>
+                  <button type="button" class="freq-chip" data-value="4× per week">4× / week</button>
+                  <button type="button" class="freq-chip" data-value="Daily (5× per week)">Daily</button>
+                  <button type="button" class="freq-chip" data-value="As needed / Ad hoc">Ad hoc</button>
+                </div>
+                <input type="hidden" id="call-frequency" />
 
-  <!-- ── 5. First 2-Week Focus Areas ── -->
-  <div class="card">
-    <div class="card-header">
-      <div class="section-num">5</div>
-      <div>
-        <div class="card-title">First 2-Week Focus Areas</div>
-        <div class="card-subtitle">Top 3 priorities we're tackling immediately</div>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="priority-list">
-        <div class="priority-item">
-          <div class="priority-num">P1</div>
-          <input id="priority-1" class="priority-input" type="text" placeholder="Top priority for the first two weeks" />
-        </div>
-        <div class="priority-item">
-          <div class="priority-num">P2</div>
-          <input id="priority-2" class="priority-input" type="text" placeholder="Second priority" />
-        </div>
-        <div class="priority-item">
-          <div class="priority-num">P3</div>
-          <input id="priority-3" class="priority-input" type="text" placeholder="Third priority" />
-        </div>
-      </div>
-    </div>
-  </div>
+                <!-- Days selector -->
+                <div class="freq-days-section" id="freq-days-section">
+                  <div class="freq-days-hint" id="freq-days-hint">Select days</div>
+                  <div class="freq-chips" id="day-chips">
+                    <button type="button" class="freq-chip" data-value="Mon">Mon</button>
+                    <button type="button" class="freq-chip" data-value="Tue">Tue</button>
+                    <button type="button" class="freq-chip" data-value="Wed">Wed</button>
+                    <button type="button" class="freq-chip" data-value="Thu">Thu</button>
+                    <button type="button" class="freq-chip" data-value="Fri">Fri</button>
+                    <button type="button" class="freq-chip" data-value="Sat">Sat</button>
+                    <button type="button" class="freq-chip" data-value="Sun">Sun</button>
+                  </div>
+                  <input type="hidden" id="call-days" />
+                </div>
+              </div>
+            </div>
 
-  <!-- ── 6. Open Discussion / AOB ── -->
-  <div class="card">
-    <div class="card-header">
-      <div class="section-num">6</div>
-      <div>
-        <div class="card-title">Open Discussion &amp; Any Other Business</div>
-        <div class="card-subtitle">Questions, concerns, clarifications from either side</div>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="input-item" style="align-items:flex-start;">
-        <div class="input-icon">📝</div>
-        <div class="input-group">
-          <label>Meeting Notes &amp; Action Items</label>
-          <textarea id="notes-aob" class="notes-area" placeholder="Capture discussion points, decisions, and action items with owners and due dates...&#10;&#10;e.g.&#10;[Action] Heaptrace to share repo invite — Owner: DM — Due: DD Mon&#10;[Action] Client to confirm cloud access — Due: DD Mon&#10;[Decision] Call cadence confirmed: Mon &amp; Wed 10 AM"></textarea>
+            <!-- Call Time & Time Zone -->
+            <div class="input-item">
+              <div class="input-icon">🕐</div>
+              <div class="input-group" style="display:flex; gap:20px;">
+                <div style="flex:1;">
+                  <label>Call Time</label>
+                  <input id="call-time" type="text" placeholder="e.g. 10:00 AM" />
+                </div>
+                <div style="flex:1; border-left:1px solid var(--border); padding-left:20px;">
+                  <label>Time Zone</label>
+                  <input id="call-timezone" type="text" placeholder="e.g. IST / EST / UTC+5:30" />
+                </div>
+              </div>
+            </div>
+
+            <div class="item">
+              <div class="item-icon">📢</div>
+              <div class="item-content">
+                <div class="item-label">Daily Work Updates</div>
+                <div class="item-desc">Work updates will be shared on the Communication channel on a daily basis to keep all stakeholders informed of progress.</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="item-icon">📋</div>
+              <div class="item-content">
+                <div class="item-label">Meeting Format</div>
+                <div class="item-desc">Agree on structure — standing agenda, who runs the call, and how action items will be tracked and followed up.</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="item-icon">📊</div>
+              <div class="item-content">
+                <div class="item-label">Delivery Review — 2× Monthly (Delivery Manager)</div>
+                <div class="item-desc">Bi-monthly check-in led by the Delivery Manager to review overall delivery health, progress, and client feedback.</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="item-icon">🤝</div>
+              <div class="item-content">
+                <div class="item-label">Management Sync — Monthly (Director of Engineering &amp; Director of Sales)</div>
+                <div class="item-desc">Monthly leadership call to discuss overall satisfaction, concerns, areas of improvement, and any new opportunities for collaboration.</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
 
-</div><!-- /content -->
+      <!-- ── 4. Escalation Path ── -->
+      <div class="card">
+        <div class="card-header">
+          <div class="section-num">4</div>
+          <div>
+            <div class="card-title">Escalation Path</div>
+            <div class="card-subtitle">Who to reach out to when you need support</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-light); margin-bottom:12px;">Heaptrace Escalation Path</div>
+            <div style="display:flex; align-items:center; gap:0;">
+              <div style="flex:1; background:#fff; border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--ht-purple); margin-bottom:4px;">Level 1</div>
+                <div style="font-size:13px; font-weight:700; color:var(--text-main);">Delivery Manager</div>
+                <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">First point of escalation for any delivery, timeline, or team concerns</div>
+              </div>
+              <div style="padding:0 10px; flex-shrink:0;">
+                <svg width="28" height="16" viewBox="0 0 28 16" fill="none">
+                  <path d="M0 8H24M24 8L17 2M24 8L17 14" stroke="url(#esc-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <defs>
+                    <linearGradient id="esc-grad" x1="0" y1="8" x2="28" y2="8" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#F27121"/><stop offset="1" stop-color="#8A2387"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div style="flex:1; background:#fff; border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
+                <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--ht-orange); margin-bottom:4px;">Level 2</div>
+                <div style="font-size:13px; font-weight:700; color:var(--text-main);">Director of Sales</div>
+                <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Senior escalation for commercial, strategic, or unresolved delivery issues</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 5. First 2-Week Focus Areas ── -->
+      <div class="card">
+        <div class="card-header">
+          <div class="section-num">5</div>
+          <div>
+            <div class="card-title">First 2-Week Focus Areas</div>
+            <div class="card-subtitle">Top 3 priorities we're tackling immediately</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="priority-list">
+            <div class="priority-item">
+              <div class="priority-num">P1</div>
+              <input id="priority-1" class="priority-input" type="text" placeholder="Top priority for the first two weeks" />
+            </div>
+            <div class="priority-item">
+              <div class="priority-num">P2</div>
+              <input id="priority-2" class="priority-input" type="text" placeholder="Second priority" />
+            </div>
+            <div class="priority-item">
+              <div class="priority-num">P3</div>
+              <input id="priority-3" class="priority-input" type="text" placeholder="Third priority" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 6. Open Discussion / AOB ── -->
+      <div class="card">
+        <div class="card-header">
+          <div class="section-num">6</div>
+          <div>
+            <div class="card-title">Open Discussion &amp; Any Other Business</div>
+            <div class="card-subtitle">Questions, concerns, clarifications from either side</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="input-item" style="align-items:flex-start;">
+            <div class="input-icon">📝</div>
+            <div class="input-group">
+              <label>Meeting Notes &amp; Action Items</label>
+              <textarea id="notes-aob" class="notes-area" placeholder="Capture discussion points, decisions, and action items with owners and due dates...&#10;&#10;e.g.&#10;[Action] Heaptrace to share repo invite — Owner: DM — Due: DD Mon&#10;[Action] Client to confirm cloud access — Due: DD Mon&#10;[Decision] Call cadence confirmed: Mon &amp; Wed 10 AM"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-area -->
+</div><!-- /app-layout -->
 
 <!-- ═══════════════ FOOTER ═══════════════ -->
 <div class="grad-bar"></div>
@@ -1000,37 +1276,96 @@
 <script>
   document.getElementById('footer-year').textContent = new Date().getFullYear();
 
-  // ── Supabase ─────────────────────────────────────────────────────────────
-  const SUPABASE_URL  = 'https://ohlipdsngaziclitcrkd.supabase.co';
-  const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9obGlwZHNuZ2F6aWNsaXRjcmtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MTI2NjIsImV4cCI6MjA5NjQ4ODY2Mn0.chaxmkpe__LwpnG3vgKKD1T0jkDd-YM4H5TQX9npw74';
+  // ── Supabase ──────────────────────────────────────────────────────────────
+  const SUPABASE_URL = 'https://ohlipdsngaziclitcrkd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9obGlwZHNuZ2F6aWNsaXRjcmtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MTI2NjIsImV4cCI6MjA5NjQ4ODY2Mn0.chaxmkpe__LwpnG3vgKKD1T0jkDd-YM4H5TQX9npw74';
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Collect all field values into a DB payload object
+  // Track current active client
+  let currentClient = null;
+  let sidebarOpen = true;
+
+  // ── Sidebar toggle ────────────────────────────────────────────────────────
+  function toggleSidebar() {
+    sidebarOpen = !sidebarOpen;
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('collapsed', !sidebarOpen);
+  }
+
+  // ── New Meeting ───────────────────────────────────────────────────────────
+  function newMeeting() {
+    // Clear all fields
+    FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = '';
+    });
+    // Reset chips
+    document.querySelectorAll('#freq-chips .freq-chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#day-chips .freq-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('freq-days-section').classList.remove('visible');
+    // Reset meta-engagement select
+    const eng = document.getElementById('meta-engagement');
+    if (eng) eng.selectedIndex = 0;
+    // Clear active client
+    currentClient = null;
+    updateActiveClientTag(null);
+    setActiveClientItem(null);
+    showToast('New meeting started');
+    // Focus client name
+    const clientInput = document.getElementById('meta-client');
+    if (clientInput) clientInput.focus();
+  }
+
+  // ── Active client tag in topbar ───────────────────────────────────────────
+  function updateActiveClientTag(name) {
+    const tag = document.getElementById('active-client-tag');
+    const nameEl = document.getElementById('active-client-name');
+    if (name) {
+      nameEl.textContent = name;
+      tag.style.display = 'inline-flex';
+    } else {
+      tag.style.display = 'none';
+    }
+  }
+
+  function setActiveClientItem(clientName) {
+    document.querySelectorAll('.client-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.client === clientName);
+    });
+  }
+
+  // ── Payload builder ───────────────────────────────────────────────────────
   function getPayload() {
     return {
-      client_name:      document.getElementById('meta-client').value.trim(),
-      meeting_date:     document.getElementById('meta-date').value || null,
-      engagement_type:  document.getElementById('meta-engagement').value || null,
-      access_cloud:     document.getElementById('access-cloud').value,
-      access_vcs:       document.getElementById('access-vcs').value,
-      access_pm:        document.getElementById('access-pm').value,
-      access_comms:     document.getElementById('access-comms').value,
-      access_additional:document.getElementById('access-additional').value,
-      call_frequency:   document.getElementById('call-frequency').value,
-      call_days:        document.getElementById('call-days').value,
-      call_time:        document.getElementById('call-time').value,
-      call_timezone:    document.getElementById('call-timezone').value,
-      priority_1:       document.getElementById('priority-1').value,
-      priority_2:       document.getElementById('priority-2').value,
-      priority_3:       document.getElementById('priority-3').value,
-      notes_aob:        document.getElementById('notes-aob').value,
-      updated_at:       new Date().toISOString()
+      client_name:       document.getElementById('meta-client').value.trim(),
+      meeting_date:      document.getElementById('meta-date').value || null,
+      engagement_type:   document.getElementById('meta-engagement').value || null,
+      access_cloud:      document.getElementById('access-cloud').value,
+      access_vcs:        document.getElementById('access-vcs').value,
+      access_pm:         document.getElementById('access-pm').value,
+      access_comms:      document.getElementById('access-comms').value,
+      access_additional: document.getElementById('access-additional').value,
+      call_frequency:    document.getElementById('call-frequency').value,
+      call_days:         document.getElementById('call-days').value,
+      call_time:         document.getElementById('call-time').value,
+      call_timezone:     document.getElementById('call-timezone').value,
+      priority_1:        document.getElementById('priority-1').value,
+      priority_2:        document.getElementById('priority-2').value,
+      priority_3:        document.getElementById('priority-3').value,
+      notes_aob:         document.getElementById('notes-aob').value,
+      updated_at:        new Date().toISOString()
     };
   }
 
+  // ── Save to Supabase ──────────────────────────────────────────────────────
   async function saveToDatabase() {
     const payload = getPayload();
-    if (!payload.client_name) { showToast('Enter a client name first'); return; }
+    if (!payload.client_name) {
+      showToast('Enter a client name first');
+      document.getElementById('meta-client').focus();
+      return;
+    }
 
     const btn = document.getElementById('save-db-btn');
     btn.disabled = true;
@@ -1047,32 +1382,59 @@
       showToast('Save failed — ' + error.message);
       console.error('Supabase save error:', error);
     } else {
-      showToast('Saved to database ✓');
-      saveAgenda(); // also update localStorage
-      await refreshClientPicker(payload.client_name);
+      currentClient = payload.client_name;
+      showToast('Saved ✓  ' + payload.client_name);
+      saveAgenda();
+      updateActiveClientTag(payload.client_name);
+      await refreshClientList(payload.client_name);
     }
   }
 
-  async function refreshClientPicker(keepSelected) {
+  // ── Refresh sidebar client list ───────────────────────────────────────────
+  async function refreshClientList(keepActive) {
     const { data } = await db
       .from('kickoff_meetings')
       .select('client_name, updated_at')
       .order('updated_at', { ascending: false });
 
-    const picker = document.getElementById('client-picker');
-    while (picker.options.length > 1) picker.remove(1);
+    const list = document.getElementById('client-list');
+    list.innerHTML = '';
 
-    if (data && data.length > 0) {
-      data.forEach(row => {
-        const opt = document.createElement('option');
-        opt.value = row.client_name;
-        opt.textContent = row.client_name;
-        picker.appendChild(opt);
-      });
+    if (!data || data.length === 0) {
+      list.innerHTML = `
+        <div class="sidebar-empty">
+          <div class="sidebar-empty-icon">📋</div>
+          <div class="sidebar-empty-text">No saved meetings yet.<br>Fill in the form and click<br>Save (☁) to get started.</div>
+        </div>`;
+      return;
     }
-    if (keepSelected) picker.value = keepSelected;
+
+    data.forEach(row => {
+      const item = document.createElement('div');
+      item.className = 'client-item';
+      item.dataset.client = row.client_name;
+      if (row.client_name === (keepActive || currentClient)) {
+        item.classList.add('active');
+      }
+      const initial = row.client_name.charAt(0).toUpperCase();
+      const dateStr  = relativeDate(row.updated_at);
+      item.innerHTML = `
+        <div class="client-avatar">${initial}</div>
+        <div class="client-item-info">
+          <div class="client-item-name">${escHtml(row.client_name)}</div>
+          <div class="client-item-date">${dateStr}</div>
+        </div>`;
+      item.addEventListener('click', () => loadClientData(row.client_name));
+      list.appendChild(item);
+    });
   }
 
+  // Keep old name as alias for DOMContentLoaded call
+  function refreshClientPicker(keepSelected) {
+    return refreshClientList(keepSelected);
+  }
+
+  // ── Load client data from Supabase ────────────────────────────────────────
   async function loadClientData(clientName) {
     if (!clientName) return;
 
@@ -1085,22 +1447,22 @@
     if (error || !data) { showToast('Could not load client data'); return; }
 
     const map = {
-      'meta-client':      data.client_name,
-      'meta-date':        data.meeting_date   || '',
-      'meta-engagement':  data.engagement_type|| '',
-      'access-cloud':     data.access_cloud   || '',
-      'access-vcs':       data.access_vcs     || '',
-      'access-pm':        data.access_pm      || '',
-      'access-comms':     data.access_comms   || '',
-      'access-additional':data.access_additional || '',
-      'call-frequency':   data.call_frequency || '',
-      'call-days':        data.call_days      || '',
-      'call-time':        data.call_time      || '',
-      'call-timezone':    data.call_timezone  || '',
-      'priority-1':       data.priority_1     || '',
-      'priority-2':       data.priority_2     || '',
-      'priority-3':       data.priority_3     || '',
-      'notes-aob':        data.notes_aob      || ''
+      'meta-client':       data.client_name,
+      'meta-date':         data.meeting_date    || '',
+      'meta-engagement':   data.engagement_type || '',
+      'access-cloud':      data.access_cloud    || '',
+      'access-vcs':        data.access_vcs      || '',
+      'access-pm':         data.access_pm       || '',
+      'access-comms':      data.access_comms    || '',
+      'access-additional': data.access_additional || '',
+      'call-frequency':    data.call_frequency  || '',
+      'call-days':         data.call_days       || '',
+      'call-time':         data.call_time       || '',
+      'call-timezone':     data.call_timezone   || '',
+      'priority-1':        data.priority_1      || '',
+      'priority-2':        data.priority_2      || '',
+      'priority-3':        data.priority_3      || '',
+      'notes-aob':         data.notes_aob       || ''
     };
 
     Object.entries(map).forEach(([id, val]) => {
@@ -1108,12 +1470,33 @@
       if (el) el.value = val;
     });
 
-    // Restore visual chip states
     restoreFreqChips();
+    currentClient = clientName;
+    updateActiveClientTag(clientName);
+    setActiveClientItem(clientName);
     showToast('Loaded: ' + clientName);
+    // Scroll to top of form
+    document.getElementById('agenda-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-  // ─────────────────────────────────────────────────────────────────────────
 
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function relativeDate(iso) {
+    if (!iso) return '';
+    const d    = new Date(iso);
+    const diff = Date.now() - d.getTime();
+    const days = Math.floor(diff / 86400000);
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7)  return days + 'd ago';
+    if (days < 30) return Math.floor(days / 7) + 'w ago';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── localStorage ──────────────────────────────────────────────────────────
   const STORAGE_KEY = 'heaptrace_kickoff_agenda_v1';
 
   const FIELDS = [
@@ -1130,12 +1513,7 @@
       const el = document.getElementById(id);
       if (el) data[id] = el.value;
     });
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      showToast('Agenda saved!');
-    } catch (e) {
-      showToast('Could not save — storage unavailable');
-    }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
   }
 
   function loadAgenda() {
@@ -1148,22 +1526,22 @@
         if (el && data[id] !== undefined) el.value = data[id];
       });
       restoreFreqChips();
-    } catch (e) {
-      // ignore stale/corrupt data
-    }
+      const savedClient = data['meta-client'];
+      if (savedClient) updateActiveClientTag(savedClient);
+    } catch (e) {}
   }
 
-  // ── Frequency helpers ──────────────────────────────────
+  // ── Frequency chip helpers ────────────────────────────────────────────────
   function freqLimit(val) {
     if (!val) return 0;
-    const n = parseInt(val);          // parses "2×…" → 2, "Daily…" → NaN
+    const n = parseInt(val);
     if (!isNaN(n)) return n;
     if (val.startsWith('Daily')) return 5;
-    return 0;                         // Ad hoc = no enforced limit
+    return 0;
   }
 
   function updateDaysHint(freqVal) {
-    const lim = freqLimit(freqVal);
+    const lim  = freqLimit(freqVal);
     const hint = document.getElementById('freq-days-hint');
     if (freqVal === 'As needed / Ad hoc') {
       hint.textContent = 'Preferred days (optional)';
@@ -1182,8 +1560,7 @@
   }
 
   function syncDaysValue() {
-    const selected = [...document.querySelectorAll('#day-chips .freq-chip.active')]
-      .map(c => c.dataset.value);
+    const selected = [...document.querySelectorAll('#day-chips .freq-chip.active')].map(c => c.dataset.value);
     document.getElementById('call-days').value = selected.join(', ');
   }
 
@@ -1192,35 +1569,25 @@
     chip.classList.add('active');
     const val = chip.dataset.value;
     document.getElementById('call-frequency').value = val;
-
-    // Clear previous day picks
     clearDayChips();
     updateDaysHint(val);
-
-    // Auto-select Mon–Fri for Daily
     if (val === 'Daily (5× per week)') {
       document.querySelectorAll('#day-chips .freq-chip').forEach(c => {
         if (['Mon','Tue','Wed','Thu','Fri'].includes(c.dataset.value)) c.classList.add('active');
       });
       syncDaysValue();
     }
-
-    // Show days section for all except Ad hoc hides no days, still show
     document.getElementById('freq-days-section').classList.add('visible');
   }
 
   function selectDay(chip) {
-    const freqVal = document.getElementById('call-frequency').value;
-    const lim = freqLimit(freqVal);
+    const freqVal   = document.getElementById('call-frequency').value;
+    const lim       = freqLimit(freqVal);
     const activeDays = document.querySelectorAll('#day-chips .freq-chip.active');
-
     if (chip.classList.contains('active')) {
       chip.classList.remove('active');
     } else {
-      if (lim > 0 && activeDays.length >= lim) {
-        // Bump the earliest selected off to make room
-        activeDays[0].classList.remove('active');
-      }
+      if (lim > 0 && activeDays.length >= lim) activeDays[0].classList.remove('active');
       chip.classList.add('active');
     }
     syncDaysValue();
@@ -1230,22 +1597,20 @@
     const freqVal = document.getElementById('call-frequency').value;
     if (freqVal) {
       document.querySelectorAll('#freq-chips .freq-chip').forEach(c => {
-        if (c.dataset.value === freqVal) c.classList.add('active');
+        c.classList.toggle('active', c.dataset.value === freqVal);
       });
       updateDaysHint(freqVal);
     }
-
     const daysVal = document.getElementById('call-days').value;
     if (daysVal) {
       const saved = daysVal.split(', ').map(s => s.trim());
       document.querySelectorAll('#day-chips .freq-chip').forEach(c => {
-        if (saved.includes(c.dataset.value)) c.classList.add('active');
+        c.classList.toggle('active', saved.includes(c.dataset.value));
       });
       document.getElementById('freq-days-section').classList.add('visible');
     }
   }
 
-  // Attach chip click handlers
   document.querySelectorAll('#freq-chips .freq-chip').forEach(chip => {
     chip.addEventListener('click', () => selectFreq(chip));
   });
@@ -1253,27 +1618,25 @@
     chip.addEventListener('click', () => selectDay(chip));
   });
 
+  // ── Toast ─────────────────────────────────────────────────────────────────
   function showToast(msg) {
     const toast = document.getElementById('toast');
-    const label = document.getElementById('toast-msg');
-    label.textContent = msg;
+    document.getElementById('toast-msg').textContent = msg;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 2400);
   }
 
+  // ── PDF Download ──────────────────────────────────────────────────────────
   async function downloadPDF() {
     const btn = document.getElementById('download-btn');
     const originalHTML = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
 
-    // Replace form fields with styled text spans so html2canvas renders the values
     const replacements = [];
     FIELDS.forEach(id => {
       const el = document.getElementById(id);
-      if (!el) return;
-      // Hidden inputs (e.g. call-frequency chips) render visually via their UI — skip proxy
-      if (el.type === 'hidden') return;
+      if (!el || el.type === 'hidden') return;
 
       let displayValue = '';
       if (el.tagName === 'SELECT') {
@@ -1312,9 +1675,13 @@
       replacements.push({ el, proxy });
     });
 
-    // Also hide the button row from the PDF
-    const btnRow = document.querySelector('.btn-row');
-    if (btnRow) btnRow.style.visibility = 'hidden';
+    // Hide non-printable UI
+    const hideEls = [
+      document.querySelector('.btn-row'),
+      document.querySelector('.sidebar'),
+      document.querySelector('.main-topbar')
+    ];
+    hideEls.forEach(el => { if (el) el.style.visibility = 'hidden'; });
 
     try {
       const clientName = document.getElementById('meta-client').value.trim();
@@ -1326,38 +1693,28 @@
         margin: 0,
         filename,
         image: { type: 'jpeg', quality: 0.97 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          scrollY: 0,
-          windowWidth: 900
-        },
+        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, windowWidth: 1100 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] }
-      }).from(document.body).save();
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      }).from(document.getElementById('agenda-content')).save();
 
     } catch (err) {
       showToast('PDF generation failed — try again');
     } finally {
-      // Restore all fields
-      replacements.forEach(({ el, proxy }) => {
-        proxy.remove();
-        el.style.display = '';
-      });
-      if (btnRow) btnRow.style.visibility = '';
+      replacements.forEach(({ el, proxy }) => { proxy.remove(); el.style.display = ''; });
+      hideEls.forEach(el => { if (el) el.style.visibility = ''; });
       btn.disabled = false;
       btn.innerHTML = originalHTML;
     }
   }
 
-  // Auto-save every 60 seconds
+  // Auto-save localStorage every 60s
   setInterval(saveAgenda, 60000);
 
-  // Load saved data and client list on page ready
+  // Init
   document.addEventListener('DOMContentLoaded', () => {
     loadAgenda();
-    refreshClientPicker();
+    refreshClientList();
   });
 </script>
 </body>
