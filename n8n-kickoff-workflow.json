@@ -1,0 +1,87 @@
+{
+  "name": "Heaptrace — Kickoff Email Sender",
+  "nodes": [
+    {
+      "id": "a1b2c3d4-0001-0001-0001-000000000001",
+      "name": "Kickoff Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "heaptrace-kickoff-sender",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "heaptrace-kickoff",
+        "responseMode": "onReceived",
+        "responseData": "noData",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0002-0002-0002-000000000002",
+      "name": "Build Email + Attach PDF",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [520, 300],
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\n\n// ── HTML email builder ─────────────────────────────\nconst row = (label, value) => {\n  if (!value || value.trim() === '') return '';\n  return `<tr>\n    <td style=\"padding:9px 14px;background:#F7F8FC;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;width:38%;border-bottom:1px solid #E8EAF2\">${label}</td>\n    <td style=\"padding:9px 14px;font-size:13px;color:#1A1535;border-bottom:1px solid #E8EAF2\">${value}</td>\n  </tr>`;\n};\n\nconst priorityBlock = (num, value, color) => {\n  if (!value || value.trim() === '') return '';\n  return `<div style=\"padding:10px 14px;background:${color}10;border-left:3px solid ${color};border-radius:0 8px 8px 0;margin-bottom:8px;font-size:13px;color:#1A1535\"><strong style=\"color:${color}\">P${num}</strong> — ${value}</div>`;\n};\n\nconst htmlBody = `<!DOCTYPE html>\n<html>\n<head><meta charset=\"UTF-8\"/></head>\n<body style=\"margin:0;padding:20px;background:#F0F2F8;font-family:Inter,Arial,sans-serif\">\n<div style=\"max-width:620px;margin:0 auto\">\n\n  <!-- Header -->\n  <div style=\"background:linear-gradient(135deg,#F27121 0%,#E94057 40%,#B43072 70%,#8A2387 100%);padding:32px;border-radius:12px 12px 0 0\">\n    <div style=\"font-size:13px;font-weight:600;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px\">Heaptrace Technology</div>\n    <div style=\"font-size:24px;font-weight:800;color:#fff;letter-spacing:-.5px\">Kickoff Meeting Agenda</div>\n    <div style=\"color:rgba(255,255,255,.5);font-size:13px;margin-top:4px\">Confidential · For Client Use Only</div>\n  </div>\n\n  <!-- Body -->\n  <div style=\"background:#fff;padding:28px 32px;border:1px solid #E8EAF2;border-top:none\">\n\n    <!-- Greeting -->\n    <p style=\"font-size:15px;font-weight:600;color:#1A1535;margin:0 0 8px\">Hi ${d.client_name} team,</p>\n    <p style=\"font-size:14px;color:#6B7280;line-height:1.75;margin:0 0 24px\">\n      Thank you for joining today's kickoff call. The full PDF agenda is attached to this email.\n      Below is a quick reference summary of everything we covered and agreed on.\n    </p>\n\n    <!-- Meeting Summary -->\n    <div style=\"font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:10px\">Meeting Summary</div>\n    <table style=\"width:100%;border-collapse:collapse;border:1px solid #E8EAF2;border-radius:10px;overflow:hidden;margin-bottom:24px\">\n      ${row('Client', d.client_name)}\n      ${row('Meeting Date', d.meeting_date)}\n      ${row('Engagement Type', d.engagement_type)}\n      ${row('Cloud Platform', d.access_cloud)}\n      ${row('Source Control', d.access_vcs)}\n      ${row('Project Management', d.access_pm)}\n      ${row('Communication Tool', d.access_comms)}\n      ${(d.access_additional || '').trim() ? row('Additional Access', d.access_additional) : ''}\n      ${row('Call Cadence', d.call_frequency)}\n      ${row('Call Days', d.call_days)}\n      ${(d.call_time || '').trim() ? row('Call Time', (d.call_time || '') + (d.call_timezone ? ' ' + d.call_timezone : '')) : ''}\n    </table>\n\n    <!-- Priorities -->\n    ${(d.priority_1 || d.priority_2 || d.priority_3) ? `\n    <div style=\"font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:10px\">First 2-Week Priorities</div>\n    <div style=\"margin-bottom:24px\">\n      ${priorityBlock(1, d.priority_1, '#F27121')}\n      ${priorityBlock(2, d.priority_2, '#E94057')}\n      ${priorityBlock(3, d.priority_3, '#B43072')}\n    </div>` : ''}\n\n    <!-- Notes -->\n    ${(d.notes_aob || '').trim() ? `\n    <div style=\"font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:10px\">Meeting Notes & Action Items</div>\n    <div style=\"background:#F7F8FC;border-radius:10px;padding:16px;margin-bottom:24px;border:1px solid #E8EAF2\">\n      <pre style=\"font-family:Inter,Arial,sans-serif;font-size:13px;color:#1A1535;white-space:pre-wrap;margin:0;line-height:1.75\">${d.notes_aob}</pre>\n    </div>` : ''}\n\n    <!-- Escalation reminder -->\n    <div style=\"background:#FFF7F0;border:1px solid #FFD9B3;border-radius:10px;padding:14px 16px;margin-bottom:24px\">\n      <div style=\"font-size:12px;font-weight:700;color:#F27121;margin-bottom:4px\">📞 Escalation Path</div>\n      <div style=\"font-size:13px;color:#6B7280\">Day-to-day concerns → <strong style=\"color:#1A1535\">Delivery Manager</strong> &nbsp;·&nbsp; Strategic issues → <strong style=\"color:#1A1535\">Director of Sales</strong></div>\n    </div>\n\n    <p style=\"font-size:13px;color:#6B7280;line-height:1.7;margin:0\">\n      Please review the attached PDF and reach out if you have any questions or need to adjust anything.\n      We're excited to get started and deliver great work for you!\n    </p>\n    <p style=\"font-size:13px;color:#6B7280;margin:16px 0 0\">Warm regards,<br/><strong style=\"color:#1A1535\">Heaptrace Technology</strong></p>\n  </div>\n\n  <!-- Footer -->\n  <div style=\"background:#110E27;padding:16px 32px;border-radius:0 0 12px 12px;text-align:center\">\n    <div style=\"font-size:12px;color:rgba(255,255,255,.3)\">Prepared by <strong style=\"color:#F27121\">Heaptrace Technology Private Limited</strong> · Confidential</div>\n  </div>\n\n</div>\n</body>\n</html>`;\n\n// ── Prepare result ──────────────────────────────────\nconst pdfBase64 = d.pdf_base64;\nconst pdfFilename = d.pdf_filename || `Heaptrace-Kickoff-${(d.client_name || 'Meeting').replace(/\\s+/g, '-')}.pdf`;\n\nconst result = {\n  json: {\n    ...d,\n    emailTo: d.client_email,\n    emailSubject: `Kickoff Meeting Agenda — ${d.client_name}`,\n    emailHtml: htmlBody\n  }\n};\n\n// Attach PDF if provided\nif (pdfBase64) {\n  result.binary = {\n    attachment: await this.helpers.prepareBinaryData(\n      Buffer.from(pdfBase64, 'base64'),\n      pdfFilename,\n      'application/pdf'\n    )\n  };\n}\n\nreturn [result];\n"
+      }
+    },
+    {
+      "id": "a1b2c3d4-0003-0003-0003-000000000003",
+      "name": "Send Kickoff Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [800, 300],
+      "parameters": {
+        "sendTo": "={{ $json.emailTo }}",
+        "subject": "={{ $json.emailSubject }}",
+        "emailType": "html",
+        "message": "={{ $json.emailHtml }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "attachment"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Kickoff Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Email + Attach PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Email + Attach PDF": {
+      "main": [
+        [
+          {
+            "node": "Send Kickoff Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "heaptrace" },
+    { "name": "kickoff" }
+  ]
+}
