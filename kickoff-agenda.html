@@ -691,10 +691,58 @@
     </div>
   </div>
 
-  <!-- ── 2. Project Access Setup ── -->
+  <!-- ── 2. Roles & Responsibilities ── -->
   <div class="card">
     <div class="card-header">
       <div class="section-num">2</div>
+      <div>
+        <div class="card-title">Roles &amp; Responsibilities</div>
+        <div class="card-subtitle">Who owns what — clarity from day one</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+
+        <!-- Management Team -->
+        <div style="border-radius:10px; border:1.5px solid var(--border); overflow:hidden;">
+          <div style="display:flex; align-items:center; gap:10px; padding:11px 14px; background:var(--surface); border-bottom:1px solid var(--border);">
+            <div style="width:28px;height:28px;border-radius:7px;background:var(--ht-grad);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🎯</div>
+            <span style="font-size:13px;font-weight:700;color:var(--text-main);">Management Team</span>
+            <span style="margin-left:auto;font-size:11px;color:var(--text-sub);font-weight:500;">Director of Sales · Director of Engineering · Delivery Manager</span>
+          </div>
+          <div style="padding:14px 16px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-light);margin-bottom:8px;">Names &amp; Responsibilities</div>
+            <textarea id="roles-management" class="notes-area" style="min-height:72px;" placeholder="e.g.
+Director of Sales — Akhilesh J. — Client relationship, commercial oversight
+Director of Engineering — [Name] — Technical direction &amp; architecture sign-off
+Delivery Manager — [Name] — Day-to-day delivery, sprint health, escalation point"></textarea>
+          </div>
+        </div>
+
+        <!-- Technical Execution Team -->
+        <div style="border-radius:10px; border:1.5px solid var(--border); overflow:hidden;">
+          <div style="display:flex; align-items:center; gap:10px; padding:11px 14px; background:var(--surface); border-bottom:1px solid var(--border);">
+            <div style="width:28px;height:28px;border-radius:7px;background:var(--ht-grad);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">⚙️</div>
+            <span style="font-size:13px;font-weight:700;color:var(--text-main);">Technical Execution Team</span>
+            <span style="margin-left:auto;font-size:11px;color:var(--text-sub);font-weight:500;">Developers · QA · DevOps</span>
+          </div>
+          <div style="padding:14px 16px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-light);margin-bottom:8px;">Names &amp; Responsibilities</div>
+            <textarea id="roles-technical" class="notes-area" style="min-height:72px;" placeholder="e.g.
+Lead Developer — [Name] — Feature development, code reviews, tech decisions
+QA Engineer — [Name] — Testing strategy, bug tracking, release sign-off
+DevOps Engineer — [Name] — CI/CD, infrastructure, deployments"></textarea>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Project Access Setup (was 2) ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="section-num">3</div>
       <div>
         <div class="card-title">Project Access Setup</div>
         <div class="card-subtitle">Confirm accounts, repos, and tool access</div>
@@ -751,10 +799,10 @@
     </div>
   </div>
 
-  <!-- ── 3. Communication & Call Protocol ── -->
+  <!-- ── 4. Communication & Call Protocol ── -->
   <div class="card">
     <div class="card-header">
-      <div class="section-num">3</div>
+      <div class="section-num">4</div>
       <div>
         <div class="card-title">Communication &amp; Call Protocol</div>
         <div class="card-subtitle">Cadence, schedule, and working hours agreement</div>
@@ -849,10 +897,10 @@
     </div>
   </div>
 
-  <!-- ── 4. Escalation Path ── -->
+  <!-- ── 5. Escalation Path ── -->
   <div class="card">
     <div class="card-header">
-      <div class="section-num">4</div>
+      <div class="section-num">5</div>
       <div>
         <div class="card-title">Escalation Path</div>
         <div class="card-subtitle">Who to reach out to when you need support</div>
@@ -887,10 +935,10 @@
     </div>
   </div>
 
-  <!-- ── 5. First 2-Week Focus Areas ── -->
+  <!-- ── 6. First 2-Week Focus Areas ── -->
   <div class="card">
     <div class="card-header">
-      <div class="section-num">5</div>
+      <div class="section-num">6</div>
       <div>
         <div class="card-title">First 2-Week Focus Areas</div>
         <div class="card-subtitle">Top 3 priorities we're tackling immediately</div>
@@ -914,10 +962,10 @@
     </div>
   </div>
 
-  <!-- ── 6. Open Discussion / AOB ── -->
+  <!-- ── 7. Open Discussion / AOB ── -->
   <div class="card">
     <div class="card-header">
-      <div class="section-num">6</div>
+      <div class="section-num">7</div>
       <div>
         <div class="card-title">Open Discussion &amp; Any Other Business</div>
         <div class="card-subtitle">Questions, concerns, clarifications from either side</div>
@@ -949,6 +997,7 @@
 
   const FIELDS = [
     'meta-client', 'meta-date', 'meta-engagement',
+    'roles-management', 'roles-technical',
     'access-cloud', 'access-vcs', 'access-pm', 'access-comms', 'access-additional',
     'call-frequency', 'call-days', 'call-time', 'call-timezone',
     'priority-1', 'priority-2', 'priority-3',
