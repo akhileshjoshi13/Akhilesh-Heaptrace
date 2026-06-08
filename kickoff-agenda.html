@@ -384,22 +384,39 @@
     .tool-field input::placeholder { color: var(--text-light); font-weight: 400; }
     .tool-field input:focus { border-bottom-color: var(--ht-purple); }
 
-    /* ── FREQ SELECT ── */
-    .freq-select {
-      width: 100%;
-      border: none;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-main);
-      background: transparent;
-      cursor: pointer;
-      -webkit-appearance: none;
-      appearance: none;
+    /* ── FREQ CHIPS ── */
+    .freq-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 7px;
     }
-    .freq-select option { background: #fff; color: var(--text-main); }
-    .freq-select option:disabled { color: var(--text-light); }
+    .freq-chip {
+      padding: 6px 14px;
+      border-radius: 100px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .freq-chip:hover {
+      border-color: var(--ht-purple);
+      color: var(--ht-purple);
+      background: rgba(180,48,114,0.05);
+    }
+    .freq-chip.active {
+      background: var(--ht-grad);
+      border-color: transparent;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 10px rgba(180,48,114,0.28);
+    }
 
     /* ── NOTES AREA ── */
     .notes-area {
@@ -725,20 +742,20 @@
           </div>
         </div>
 
-        <!-- Call frequency dropdown -->
-        <div class="input-item">
-          <div class="input-icon">🔁</div>
+        <!-- Call frequency chips -->
+        <div class="input-item" style="align-items:flex-start;">
+          <div class="input-icon" style="margin-top:2px;">🔁</div>
           <div class="input-group">
             <label>Call Frequency per Week</label>
-            <select id="call-frequency" class="freq-select">
-              <option value="" disabled selected>Select frequency</option>
-              <option>1× per week</option>
-              <option>2× per week</option>
-              <option>3× per week</option>
-              <option>4× per week</option>
-              <option>Daily (5× per week)</option>
-              <option>As needed / Ad hoc</option>
-            </select>
+            <div class="freq-chips" id="freq-chips">
+              <button type="button" class="freq-chip" data-value="1× per week">1× / week</button>
+              <button type="button" class="freq-chip" data-value="2× per week">2× / week</button>
+              <button type="button" class="freq-chip" data-value="3× per week">3× / week</button>
+              <button type="button" class="freq-chip" data-value="4× per week">4× / week</button>
+              <button type="button" class="freq-chip" data-value="Daily (5× per week)">Daily</button>
+              <button type="button" class="freq-chip" data-value="As needed / Ad hoc">Ad hoc</button>
+            </div>
+            <input type="hidden" id="call-frequency" />
           </div>
         </div>
 
@@ -918,10 +935,30 @@
         const el = document.getElementById(id);
         if (el && data[id] !== undefined) el.value = data[id];
       });
+      restoreFreqChips();
     } catch (e) {
       // ignore stale/corrupt data
     }
   }
+
+  function selectFreq(chip) {
+    document.querySelectorAll('#freq-chips .freq-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    document.getElementById('call-frequency').value = chip.dataset.value;
+  }
+
+  function restoreFreqChips() {
+    const val = document.getElementById('call-frequency').value;
+    if (!val) return;
+    document.querySelectorAll('#freq-chips .freq-chip').forEach(chip => {
+      if (chip.dataset.value === val) chip.classList.add('active');
+    });
+  }
+
+  // Attach chip click handlers
+  document.querySelectorAll('#freq-chips .freq-chip').forEach(chip => {
+    chip.addEventListener('click', () => selectFreq(chip));
+  });
 
   function showToast(msg) {
     const toast = document.getElementById('toast');
@@ -942,6 +979,8 @@
     FIELDS.forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
+      // Hidden inputs (e.g. call-frequency chips) render visually via their UI — skip proxy
+      if (el.type === 'hidden') return;
 
       let displayValue = '';
       if (el.tagName === 'SELECT') {
