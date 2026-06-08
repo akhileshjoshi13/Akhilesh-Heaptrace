@@ -580,6 +580,74 @@
       input, textarea, .meta-select { color: #000 !important; }
     }
 
+    /* ── EMAIL MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(17,14,39,.65);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .22s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-card {
+      background: #fff; border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(17,14,39,.28);
+      padding: 32px 28px 28px;
+      width: 100%; max-width: 420px; margin: 16px;
+      transform: translateY(20px) scale(.97);
+      transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+    }
+    .modal-overlay.open .modal-card { transform: translateY(0) scale(1); }
+    .modal-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: var(--ht-grad); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 24px; margin-bottom: 16px;
+    }
+    .modal-title {
+      font-size: 18px; font-weight: 800; color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .modal-sub {
+      font-size: 13px; color: var(--text-sub); line-height: 1.65;
+      margin-bottom: 20px;
+    }
+    .modal-input {
+      width: 100%; border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 11px 14px;
+      font-family: 'Inter', sans-serif; font-size: 14px;
+      color: var(--text-main); outline: none;
+      transition: border-color .15s;
+      margin-bottom: 18px;
+    }
+    .modal-input:focus { border-color: var(--ht-purple); }
+    .modal-input::placeholder { color: var(--text-light); }
+    .modal-input.error { border-color: var(--ht-red); }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-btn {
+      flex: 1; padding: 11px 16px; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      font-weight: 600; cursor: pointer;
+      transition: opacity .15s, transform .12s;
+      border: none;
+    }
+    .modal-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .modal-btn.secondary {
+      background: var(--surface); border: 1.5px solid var(--border);
+      color: var(--text-sub);
+    }
+    .modal-btn.primary {
+      background: var(--ht-grad); color: #fff;
+    }
+    .modal-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .modal-sending-hint {
+      display: none; text-align: center;
+      font-size: 12px; color: var(--text-sub);
+      margin-top: 12px;
+    }
+    .modal-sending-hint.show { display: block; }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       body { overflow: auto; height: auto; }
@@ -604,6 +672,27 @@
 <div class="toast" id="toast">
   <div class="toast-dot"></div>
   <span id="toast-msg">Saved!</span>
+</div>
+
+<!-- ── EMAIL MODAL ── -->
+<div class="modal-overlay" id="email-modal" onclick="handleModalOverlayClick(event)">
+  <div class="modal-card">
+    <div class="modal-icon">✉️</div>
+    <h3 class="modal-title">Save &amp; Send Kickoff Summary</h3>
+    <p class="modal-sub">Enter the client's email address to send them a formatted summary email with the PDF agenda attached.</p>
+    <input type="email" id="modal-email" class="modal-input"
+           placeholder="client@company.com" autocomplete="email"
+           onkeydown="if(event.key==='Enter') confirmSendEmail()"/>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" id="modal-save-only-btn" onclick="saveOnly()">Save only</button>
+      <button class="modal-btn primary"   id="modal-send-btn"      onclick="confirmSendEmail()">
+        Save &amp; Send Email
+      </button>
+    </div>
+    <div class="modal-sending-hint" id="modal-sending-hint">
+      Saving to database &amp; generating PDF… please wait
+    </div>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -633,7 +722,7 @@
         </button>
 
         <!-- Save to Supabase -->
-        <button class="hdr-btn" id="save-db-btn" onclick="saveToDatabase()" title="Save to Database">
+        <button class="hdr-btn" id="save-db-btn" onclick="openSendModal()" title="Save / Send to Client">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
         </button>
 
@@ -991,6 +1080,10 @@
 <script>
   document.getElementById('footer-year').textContent = new Date().getFullYear();
 
+  /* ── n8n Webhook ──────────────────────────────────────────── */
+  // Paste your n8n Webhook URL here after you create the workflow
+  const N8N_WEBHOOK_URL = 'YOUR_N8N_WEBHOOK_URL';
+
   /* ── Supabase ─────────────────────────────────────────────── */
   const SUPABASE_URL = 'https://ohlipdsngaziclitcrkd.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9obGlwZHNuZ2F6aWNsaXRjcmtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MTI2NjIsImV4cCI6MjA5NjQ4ODY2Mn0.chaxmkpe__LwpnG3vgKKD1T0jkDd-YM4H5TQX9npw74';
@@ -1096,7 +1189,106 @@
     };
   }
 
-  /* ── Save to Supabase ─────────────────────────────────────── */
+  /* ── Modal helpers ────────────────────────────────────────── */
+  function openSendModal() {
+    const name = document.getElementById('meta-client').value.trim();
+    if (!name) {
+      showToast('Enter a client name first');
+      const inp = document.getElementById('meta-client');
+      inp.focus();
+      inp.closest('.meta-field').style.borderColor = 'rgba(242,113,33,.6)';
+      setTimeout(() => inp.closest('.meta-field').style.borderColor = '', 2000);
+      return;
+    }
+    document.getElementById('modal-email').value = '';
+    document.getElementById('modal-email').classList.remove('error');
+    document.getElementById('modal-sending-hint').classList.remove('show');
+    setModalBusy(false);
+    document.getElementById('email-modal').classList.add('open');
+    setTimeout(() => document.getElementById('modal-email').focus(), 120);
+  }
+
+  function closeSendModal() {
+    document.getElementById('email-modal').classList.remove('open');
+  }
+
+  function handleModalOverlayClick(e) {
+    if (e.target === document.getElementById('email-modal')) closeSendModal();
+  }
+
+  function setModalBusy(busy) {
+    document.getElementById('modal-save-only-btn').disabled = busy;
+    document.getElementById('modal-send-btn').disabled = busy;
+    document.getElementById('modal-sending-hint').classList.toggle('show', busy);
+  }
+
+  /* ── Save only (no email) ─────────────────────────────────── */
+  async function saveOnly() {
+    setModalBusy(true);
+    await saveToDatabase();
+    setModalBusy(false);
+    closeSendModal();
+  }
+
+  /* ── Confirm send email ───────────────────────────────────── */
+  async function confirmSendEmail() {
+    const emailEl = document.getElementById('modal-email');
+    const email = emailEl.value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailEl.classList.add('error');
+      emailEl.focus();
+      return;
+    }
+    emailEl.classList.remove('error');
+    setModalBusy(true);
+
+    // 1. Save to Supabase first
+    const saved = await saveToDatabase();
+    if (saved === false) { setModalBusy(false); return; } // validation failed inside saveToDatabase
+
+    // 2. Generate PDF as base64
+    let pdfBase64 = null;
+    try {
+      pdfBase64 = await generatePDFBase64();
+    } catch(e) {
+      console.warn('PDF generation failed, sending email without attachment:', e);
+    }
+
+    // 3. POST to n8n
+    if (!N8N_WEBHOOK_URL || N8N_WEBHOOK_URL === 'YOUR_N8N_WEBHOOK_URL') {
+      showToast('⚠️ Set N8N_WEBHOOK_URL in the code first');
+      setModalBusy(false);
+      closeSendModal();
+      return;
+    }
+
+    try {
+      const payload = getPayload();
+      const res = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...payload,
+          client_email: email,
+          pdf_base64: pdfBase64,
+          pdf_filename: `Heaptrace-Kickoff-${(payload.client_name || 'Meeting').replace(/\s+/g,'-')}.pdf`
+        })
+      });
+      if (res.ok) {
+        showToast('✓ Saved & email sent to ' + email);
+      } else {
+        showToast('Saved, but email failed (' + res.status + ')');
+      }
+    } catch(e) {
+      showToast('Saved, but could not reach n8n');
+      console.error(e);
+    }
+
+    setModalBusy(false);
+    closeSendModal();
+  }
+
+  /* ── Save to Supabase (returns false on validation fail) ─── */
   async function saveToDatabase() {
     const payload = getPayload();
     if (!payload.client_name) {
@@ -1105,7 +1297,7 @@
       inp.focus();
       inp.closest('.meta-field').style.borderColor = 'rgba(242,113,33,.6)';
       setTimeout(() => inp.closest('.meta-field').style.borderColor = '', 2000);
-      return;
+      return false;
     }
     const btn = document.getElementById('save-db-btn');
     btn.disabled = true;
@@ -1119,13 +1311,54 @@
     if (error) {
       showToast('Save failed — ' + error.message);
       console.error(error);
+      return false;
     } else {
       currentClient = payload.client_name;
       showToast('Saved ✓  ' + payload.client_name);
       saveAgenda();
       setActivePill(payload.client_name);
       await refreshClientList(payload.client_name);
+      return true;
     }
+  }
+
+  /* ── Generate PDF → base64 string ────────────────────────── */
+  async function generatePDFBase64() {
+    const replacements = [];
+    FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el || el.type === 'hidden') return;
+      const val = el.tagName === 'SELECT' ? (el.selectedIndex > 0 ? el.options[el.selectedIndex].text : '') : el.value;
+      const proxy = document.createElement(el.tagName === 'TEXTAREA' ? 'div' : 'span');
+      proxy.className = '__pdf-proxy';
+      const cs = window.getComputedStyle(el);
+      proxy.style.cssText = `font-family:${cs.fontFamily};font-size:${cs.fontSize};font-weight:${cs.fontWeight};line-height:${cs.lineHeight};width:100%;display:block;white-space:pre-wrap;word-break:break-word;color:${val ? cs.color : 'rgba(0,0,0,.3)'};background:transparent`;
+      proxy.textContent = val || el.placeholder || '';
+      el.parentNode.insertBefore(proxy, el);
+      el.style.display = 'none';
+      replacements.push({ el, proxy });
+    });
+    const hideEls = [document.querySelector('.sidebar'), document.querySelector('.main-topbar'), document.querySelector('.btn-row')];
+    hideEls.forEach(el => { if (el) el.style.display = 'none'; });
+
+    let base64 = null;
+    try {
+      const pdfOpts = {
+        margin: 0,
+        image: { type: 'jpeg', quality: .97 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, windowWidth: 900 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all','css','legacy'] }
+      };
+      const dataUri = await html2pdf().set(pdfOpts)
+        .from(document.getElementById('agenda-content'))
+        .outputPdf('datauristring');
+      base64 = dataUri.split(',')[1]; // strip "data:application/pdf;base64,"
+    } finally {
+      replacements.forEach(({ el, proxy }) => { proxy.remove(); el.style.display = ''; });
+      hideEls.forEach(el => { if (el) el.style.display = ''; });
+    }
+    return base64;
   }
 
   /* ── Refresh sidebar list ─────────────────────────────────── */
@@ -1298,39 +1531,21 @@
     const btn = document.getElementById('download-btn');
     const orig = btn.innerHTML;
     btn.disabled = true; btn.innerHTML = spinnerSVG();
-
-    const replacements = [];
-    FIELDS.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el || el.type === 'hidden') return;
-      const val = el.tagName === 'SELECT' ? (el.selectedIndex > 0 ? el.options[el.selectedIndex].text : '') : el.value;
-      const proxy = document.createElement(el.tagName === 'TEXTAREA' ? 'div' : 'span');
-      proxy.className = '__pdf-proxy';
-      const cs = window.getComputedStyle(el);
-      proxy.style.cssText = `font-family:${cs.fontFamily};font-size:${cs.fontSize};font-weight:${cs.fontWeight};line-height:${cs.lineHeight};width:100%;display:block;white-space:pre-wrap;word-break:break-word;color:${val ? cs.color : 'rgba(0,0,0,.3)'};background:transparent`;
-      proxy.textContent = val || el.placeholder || '';
-      el.parentNode.insertBefore(proxy, el);
-      el.style.display = 'none';
-      replacements.push({ el, proxy });
-    });
-    const hideEls = [document.querySelector('.sidebar'), document.querySelector('.main-topbar'), document.querySelector('.btn-row')];
-    hideEls.forEach(el => { if (el) el.style.display = 'none'; });
-
     try {
+      const base64 = await generatePDFBase64();
       const name = document.getElementById('meta-client').value.trim();
-      await html2pdf().set({
-        margin: 0, filename: name ? `Heaptrace-Kickoff-${name.replace(/\s+/g,'-')}.pdf` : 'Heaptrace-Kickoff.pdf',
-        image: { type: 'jpeg', quality: .97 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, windowWidth: 900 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all','css','legacy'] }
-      }).from(document.getElementById('agenda-content')).save();
-    } catch(e) { showToast('PDF generation failed'); }
-    finally {
-      replacements.forEach(({ el, proxy }) => { proxy.remove(); el.style.display = ''; });
-      hideEls.forEach(el => { if (el) el.style.display = ''; });
-      btn.disabled = false; btn.innerHTML = orig;
-    }
+      const filename = name ? `Heaptrace-Kickoff-${name.replace(/\s+/g,'-')}.pdf` : 'Heaptrace-Kickoff.pdf';
+      // Convert base64 → blob → download link
+      const bytes = atob(base64);
+      const arr   = new Uint8Array(bytes.length);
+      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+      const blob = new Blob([arr], { type: 'application/pdf' });
+      const url  = URL.createObjectURL(blob);
+      const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
+    } catch(e) { showToast('PDF generation failed'); console.error(e); }
+    finally { btn.disabled = false; btn.innerHTML = orig; }
   }
 
   /* ── SVG helpers ──────────────────────────────────────────── */
