@@ -9,14 +9,17 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+    /* ── CSS VARIABLES ── */
     :root {
       --ht-dark:    #110E27;
       --ht-orange:  #F27121;
       --ht-red:     #E94057;
       --ht-purple:  #B43072;
       --ht-violet:  #8A2387;
-      --ht-grad: linear-gradient(135deg, #F27121 0%, #E94057 40%, #B43072 70%, #8A2387 100%);
-      --ht-grad-h:  linear-gradient(90deg,  #F27121 0%, #E94057 40%, #B43072 70%, #8A2387 100%);
+      --ht-grad:    linear-gradient(135deg,#F27121 0%,#E94057 40%,#B43072 70%,#8A2387 100%);
+      --ht-grad-h:  linear-gradient(90deg,  #F27121 0%,#E94057 40%,#B43072 70%,#8A2387 100%);
+      --sidebar-bg: #0D0A1F;
+      --sidebar-w:  264px;
       --surface:    #F7F8FC;
       --card:       #FFFFFF;
       --border:     #E8EAF2;
@@ -25,899 +28,633 @@
       --text-light: #9CA3AF;
       --radius:     14px;
       --shadow:     0 2px 16px rgba(17,14,39,0.08);
-      --sidebar-w:  256px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── BODY: full-height flex column ── */
+    html { height: 100%; }
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--surface);
       color: var(--text-main);
-      min-height: 100vh;
+      background: var(--surface);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    /* ── TOP HEADER ── */
+    /* ══════════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════════ */
     .header {
+      flex-shrink: 0;
       background: var(--ht-dark);
-      padding: 0;
       position: relative;
       overflow: hidden;
     }
     .header::before {
       content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 80% 50%, rgba(242,113,33,0.18) 0%, transparent 60%),
-                  radial-gradient(ellipse at 20% 80%, rgba(138,35,135,0.2) 0%, transparent 60%);
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 80% 50%, rgba(242,113,33,.18) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 80%, rgba(138,35,135,.20) 0%, transparent 60%);
       pointer-events: none;
     }
     .header-inner {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 36px 32px 32px;
-      position: relative;
-      z-index: 1;
+      padding: 28px 32px 24px;
+      position: relative; z-index: 1;
     }
     .header-top {
-      display: flex;
-      align-items: center;
+      display: flex; align-items: center;
       justify-content: space-between;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
-    .logo-wrap { display: flex; align-items: center; }
-    .logo-wrap svg { height: 36px; width: auto; }
+    .logo-wrap svg { height: 32px; width: auto; }
+    .btn-row { display: flex; align-items: center; gap: 8px; }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 500;
-      padding: 5px 12px;
-      border-radius: 100px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.15);
+      color: #fff; font-size: 12px; font-weight: 500;
+      padding: 5px 12px; border-radius: 100px;
     }
-    .badge-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--ht-grad-h);
+    .badge-dot { width:7px; height:7px; border-radius:50%; background:var(--ht-grad-h); flex-shrink:0; }
+
+    /* icon buttons in header */
+    .hdr-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18);
+      color: #fff; cursor: pointer;
+      transition: background .18s, transform .15s;
       flex-shrink: 0;
     }
+    .hdr-btn:hover { background: rgba(255,255,255,.22); transform: scale(1.08); }
+    .hdr-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .hdr-btn.gradient { background: var(--ht-grad); border: none; }
+    .hdr-btn.gradient:hover { opacity: .88; }
+    /* sidebar toggle — highlight when open */
+    #sidebar-toggle-btn.open { background: rgba(242,113,33,.25); border-color: rgba(242,113,33,.5); }
 
     .header-title {
-      color: #fff;
-      font-size: 30px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      line-height: 1.2;
+      color: #fff; font-size: 26px; font-weight: 800;
+      letter-spacing: -.5px; line-height: 1.2;
     }
     .header-title span {
       background: var(--ht-grad-h);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .header-sub {
-      color: rgba(255,255,255,0.55);
-      font-size: 14px;
-      margin-top: 6px;
-      font-weight: 400;
-    }
+    .header-sub { color: rgba(255,255,255,.50); font-size: 13px; margin-top: 4px; }
 
     .meta-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 24px;
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px;
     }
     .meta-field {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 10px;
-      padding: 10px 16px;
-      flex: 1;
-      min-width: 180px;
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px; padding: 9px 14px; flex: 1; min-width: 160px;
     }
     .meta-field label {
-      color: rgba(255,255,255,0.45);
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      white-space: nowrap;
+      color: rgba(255,255,255,.40); font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .06em; white-space: nowrap;
     }
     .meta-field input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 500;
-      font-family: 'Inter', sans-serif;
-      width: 100%;
+      background: transparent; border: none; outline: none;
+      color: #fff; font-size: 13px; font-weight: 500;
+      font-family: 'Inter', sans-serif; width: 100%;
       caret-color: var(--ht-orange);
     }
-    .meta-field input::placeholder { color: rgba(255,255,255,0.25); }
+    .meta-field input::placeholder { color: rgba(255,255,255,.22); }
     .meta-select {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 500;
-      font-family: 'Inter', sans-serif;
-      width: 100%;
-      cursor: pointer;
-      -webkit-appearance: none;
-      appearance: none;
+      background: transparent; border: none; outline: none;
+      color: #fff; font-size: 13px; font-weight: 500;
+      font-family: 'Inter', sans-serif; width: 100%; cursor: pointer;
+      -webkit-appearance: none; appearance: none;
     }
     .meta-select option { background: #1e1a3a; color: #fff; }
-    .meta-select option:disabled { color: rgba(255,255,255,0.3); }
 
     /* ── GRADIENT DIVIDER ── */
-    .grad-bar {
-      height: 3px;
-      background: var(--ht-grad-h);
-    }
+    .grad-bar { flex-shrink: 0; height: 3px; background: var(--ht-grad-h); }
 
-    /* ══════════════ APP LAYOUT ══════════════ */
-    .app-layout {
+    /* ══════════════════════════════════════════
+       PAGE SHELL  (fills space between header & footer)
+    ══════════════════════════════════════════ */
+    .page-shell {
+      flex: 1;
+      min-height: 0;       /* crucial: lets flex children shrink below content size */
       display: flex;
-      align-items: flex-start;
-      min-height: calc(100vh - 180px);
+      overflow: hidden;
     }
 
-    /* ── SIDEBAR ── */
+    /* ══════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════ */
     .sidebar {
       width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
       flex-shrink: 0;
-      background: var(--ht-dark);
-      border-right: 1px solid rgba(255,255,255,0.07);
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow: hidden;
-      transition: width 0.32s cubic-bezier(0.4,0,0.2,1),
-                  min-width 0.32s cubic-bezier(0.4,0,0.2,1);
-      z-index: 50;
-    }
-    .sidebar.collapsed {
-      width: 0;
-      min-width: 0;
-    }
-    .sidebar::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 0%, rgba(180,48,114,0.12) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .sidebar-inner {
-      width: var(--sidebar-w);
-      height: 100%;
+      background: var(--sidebar-bg);
+      border-right: 1px solid rgba(255,255,255,.06);
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
+      overflow: hidden;
+      transition: width .3s cubic-bezier(.4,0,.2,1);
+      position: relative;
+      z-index: 10;
+    }
+    .sidebar.collapsed { width: 0; }
+    .sidebar::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(180,48,114,.14) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    /* Inner wrapper keeps content width fixed during collapse animation */
+    .sidebar-inner {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative; z-index: 1;
     }
 
     /* Sidebar header row */
     .sidebar-hd {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 14px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
       flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
     }
-    .sidebar-ttl {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.35);
+    .sidebar-title {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: rgba(255,255,255,.35);
     }
-    .sidebar-close-btn {
-      width: 26px; height: 26px;
-      border-radius: 7px;
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.1);
-      cursor: pointer;
+    .sidebar-close {
+      width: 26px; height: 26px; border-radius: 7px;
+      background: transparent; border: 1px solid rgba(255,255,255,.1);
+      color: rgba(255,255,255,.4); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      color: rgba(255,255,255,0.4);
-      transition: background 0.15s, color 0.15s;
-      flex-shrink: 0;
+      transition: background .15s, color .15s;
     }
-    .sidebar-close-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .sidebar-close:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    /* Search box */
+    .sidebar-search-wrap {
+      flex-shrink: 0;
+      margin: 10px 10px 0;
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10);
+      border-radius: 9px; padding: 7px 10px;
+      transition: border-color .15s;
+    }
+    .sidebar-search-wrap:focus-within { border-color: rgba(242,113,33,.5); }
+    .sidebar-search-wrap svg { flex-shrink: 0; color: rgba(255,255,255,.3); }
+    #sidebar-search {
+      flex: 1; background: transparent; border: none; outline: none;
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400;
+      color: #fff;
+    }
+    #sidebar-search::placeholder { color: rgba(255,255,255,.25); }
+    .search-clear {
+      background: transparent; border: none;
+      color: rgba(255,255,255,.35); font-size: 16px; cursor: pointer;
+      line-height: 1; display: none; padding: 0 2px;
+      transition: color .15s;
+    }
+    .search-clear:hover { color: #fff; }
 
     /* New meeting button */
     .new-mtg-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: calc(100% - 20px);
-      margin: 12px 10px 8px;
-      padding: 9px 14px;
-      border-radius: 10px;
-      border: 1.5px dashed rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.03);
-      color: rgba(255,255,255,0.65);
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s, color 0.15s;
-      white-space: nowrap;
       flex-shrink: 0;
+      display: flex; align-items: center; gap: 8px;
+      margin: 10px 10px 6px;
+      padding: 8px 13px;
+      border-radius: 9px;
+      border: 1.5px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.03);
+      color: rgba(255,255,255,.60); font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 500; cursor: pointer;
+      transition: border-color .15s, background .15s, color .15s;
+      white-space: nowrap;
     }
     .new-mtg-btn:hover {
       border-color: var(--ht-orange);
-      background: rgba(242,113,33,0.08);
+      background: rgba(242,113,33,.08);
       color: #fff;
     }
 
-    /* Client list */
-    .client-list-wrap {
+    /* Section label */
+    .sidebar-section-lbl {
+      flex-shrink: 0;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: rgba(255,255,255,.22);
+      padding: 8px 14px 4px;
+    }
+
+    /* Client list scroll area */
+    .client-list-scroll {
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 4px 0 20px;
+      padding-bottom: 16px;
     }
-    .client-list-wrap::-webkit-scrollbar { width: 4px; }
-    .client-list-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .client-list-scroll::-webkit-scrollbar { width: 3px; }
+    .client-list-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 2px; }
 
-    .sidebar-section-label {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.25);
-      padding: 10px 14px 6px;
-    }
-
+    /* Client item */
     .client-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
-      cursor: pointer;
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px; cursor: pointer;
       border-left: 3px solid transparent;
-      transition: background 0.15s, border-color 0.15s;
+      transition: background .15s, border-color .15s;
       white-space: nowrap;
     }
-    .client-item:hover { background: rgba(255,255,255,0.05); }
+    .client-item:hover { background: rgba(255,255,255,.05); }
     .client-item.active {
-      background: rgba(242,113,33,0.1);
+      background: rgba(242,113,33,.10);
       border-left-color: var(--ht-orange);
     }
     .client-avatar {
-      width: 32px; height: 32px;
-      border-radius: 9px;
+      width: 30px; height: 30px; border-radius: 8px;
       background: var(--ht-grad);
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
-      color: #fff;
+      font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .client-info { flex: 1; min-width: 0; }
+    .client-name {
+      font-size: 13px; font-weight: 600; color: #fff;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .client-date { font-size: 11px; color: rgba(255,255,255,.28); margin-top: 1px; }
+
+    /* Empty & loading states */
+    .sidebar-empty {
+      padding: 28px 16px; text-align: center;
+    }
+    .sidebar-empty-icon { font-size: 30px; opacity: .4; margin-bottom: 10px; }
+    .sidebar-empty-text { font-size: 12px; color: rgba(255,255,255,.28); line-height: 1.65; }
+
+    .sidebar-no-results {
+      display: none; padding: 16px 14px;
+      font-size: 12px; color: rgba(255,255,255,.3); line-height: 1.5;
+    }
+
+    /* Skeleton loader */
+    .skeleton-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px;
+    }
+    .skeleton-avatar {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: rgba(255,255,255,.08);
+      animation: shimmer 1.5s infinite;
       flex-shrink: 0;
     }
-    .client-item-info { flex: 1; min-width: 0; }
-    .client-item-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #fff;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .skeleton-lines { flex: 1; }
+    .skeleton-line {
+      height: 10px; border-radius: 5px;
+      background: rgba(255,255,255,.08);
+      animation: shimmer 1.5s infinite;
+      margin-bottom: 6px;
     }
-    .client-item-date {
-      font-size: 11px;
-      color: rgba(255,255,255,0.28);
-      margin-top: 1px;
-    }
-
-    /* Sidebar empty state */
-    .sidebar-empty {
-      padding: 24px 14px;
-      text-align: center;
-    }
-    .sidebar-empty-icon {
-      font-size: 28px;
-      margin-bottom: 10px;
-      opacity: 0.5;
-    }
-    .sidebar-empty-text {
-      font-size: 12px;
-      color: rgba(255,255,255,0.3);
-      line-height: 1.6;
+    .skeleton-line.long  { width: 70%; }
+    .skeleton-line.short { width: 40%; margin-bottom: 0; }
+    @keyframes shimmer {
+      0%,100% { opacity: .5; }
+      50%      { opacity: 1;  }
     }
 
-    /* ── MAIN AREA ── */
-    .main-area {
+    /* ══════════════════════════════════════════
+       MAIN SCROLL AREA
+    ══════════════════════════════════════════ */
+    .main-scroll {
       flex: 1;
       min-width: 0;
-      display: flex;
-      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: var(--surface);
     }
 
-    /* Top bar inside main area */
+    /* Topbar inside main area */
     .main-topbar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 32px 0;
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 32px 0; flex-shrink: 0;
     }
-    .panel-toggle-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 11px;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-sub);
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s, background 0.15s;
-      box-shadow: 0 1px 4px rgba(17,14,39,0.06);
-      white-space: nowrap;
+    .topbar-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 12px;
+      font-family: 'Inter', sans-serif; font-size: 12px;
+      font-weight: 500; color: var(--text-sub); cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s;
+      box-shadow: 0 1px 4px rgba(17,14,39,.06); white-space: nowrap;
     }
-    .panel-toggle-btn:hover {
-      border-color: var(--ht-purple);
-      color: var(--ht-purple);
-      background: rgba(180,48,114,0.04);
+    .topbar-toggle:hover { border-color: var(--ht-purple); color: var(--ht-purple); }
+    .active-client-pill {
+      display: none; align-items: center; gap: 6px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 12px;
+      font-size: 12px; font-weight: 600; color: var(--text-sub);
+      box-shadow: 0 1px 4px rgba(17,14,39,.06);
     }
-    .active-client-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-sub);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 12px;
-      box-shadow: 0 1px 4px rgba(17,14,39,0.06);
-    }
-    .active-client-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--ht-grad-h);
-      flex-shrink: 0;
-    }
+    .active-client-pill.show { display: inline-flex; }
+    .pill-dot { width:7px; height:7px; border-radius:50%; background:var(--ht-grad-h); flex-shrink:0; }
 
-    /* ── CONTENT ── */
+    /* ── CONTENT (form sections) ── */
     .content {
-      max-width: 900px;
-      margin: 24px auto;
-      padding: 0 32px 60px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      max-width: 860px;
+      margin: 20px auto;
+      padding: 0 32px 48px;
+      display: flex; flex-direction: column; gap: 18px;
     }
 
     /* ── SECTION CARD ── */
     .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); border: 1px solid var(--border);
       overflow: hidden;
     }
     .card-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 18px 22px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
     }
     .section-num {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      background: var(--ht-grad);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--ht-grad); color: #fff;
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .card-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text-main);
-    }
-    .card-subtitle {
-      font-size: 12px;
-      color: var(--text-sub);
-      margin-top: 1px;
-    }
-    .card-duration {
-      margin-left: auto;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--ht-purple);
-      background: rgba(180,48,114,0.08);
-      padding: 3px 10px;
-      border-radius: 100px;
-      white-space: nowrap;
-    }
-    .card-body { padding: 20px 22px; }
+    .card-title  { font-size: 14px; font-weight: 700; color: var(--text-main); }
+    .card-subtitle { font-size: 12px; color: var(--text-sub); margin-top: 1px; }
+    .card-body { padding: 18px 20px; }
 
     /* ── ITEM ROWS ── */
     .item-list { display: flex; flex-direction: column; gap: 10px; }
     .item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 9px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      transition: border-color 0.2s;
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 14px; border-radius: 9px;
+      background: var(--surface); border: 1px solid var(--border);
+      transition: border-color .2s;
     }
-    .item:hover { border-color: rgba(180,48,114,0.25); }
+    .item:hover { border-color: rgba(180,48,114,.25); }
     .item-icon {
-      width: 28px; height: 28px;
-      border-radius: 7px;
+      width: 28px; height: 28px; border-radius: 7px;
       background: var(--ht-grad);
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      font-size: 13px;
+      flex-shrink: 0; font-size: 13px;
     }
     .item-content { flex: 1; }
-    .item-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-main);
-      margin-bottom: 2px;
-    }
-    .item-desc {
-      font-size: 12px;
-      color: var(--text-sub);
-      line-height: 1.5;
-    }
+    .item-label  { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
+    .item-desc   { font-size: 12px; color: var(--text-sub); line-height: 1.5; }
 
     /* ── INLINE INPUT ITEMS ── */
     .input-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 9px;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      transition: border-color 0.2s;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 9px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      transition: border-color .2s;
     }
     .input-item:focus-within { border-color: var(--ht-purple); background: #fff; }
     .input-icon {
-      width: 28px; height: 28px;
-      border-radius: 7px;
+      width: 28px; height: 28px; border-radius: 7px;
       background: var(--ht-dark);
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      font-size: 13px;
+      flex-shrink: 0; font-size: 13px;
     }
     .input-group { flex: 1; }
     .input-group label {
-      display: block;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-light);
-      margin-bottom: 3px;
+      display: block; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--text-light); margin-bottom: 3px;
     }
     .input-group input, .input-group textarea {
-      width: 100%;
-      border: none;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-main);
-      background: transparent;
-      resize: none;
+      width: 100%; border: none; outline: none;
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      font-weight: 500; color: var(--text-main);
+      background: transparent; resize: none;
     }
     .input-group input::placeholder,
     .input-group textarea::placeholder { color: var(--text-light); font-weight: 400; }
 
-    /* ── CALL SCHEDULE ── */
-    .schedule-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    /* ── PRIORITIES ── */
-    .priority-list { display: flex; flex-direction: column; gap: 10px; }
-    .priority-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      transition: border-color 0.2s;
-    }
-    .priority-item:focus-within { border-color: var(--ht-orange); background: #fff; }
-    .priority-num {
-      width: 28px; height: 28px;
-      border-radius: 7px;
-      background: var(--ht-grad);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .priority-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-main);
-      background: transparent;
-    }
-    .priority-input::placeholder { color: var(--text-light); font-weight: 400; }
-
-    /* ── ACCESS TOOL GRID ── */
-    .tool-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    /* ── TOOL GRID ── */
+    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .tool-card {
-      padding: 14px;
-      border-radius: 10px;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      transition: border-color 0.2s;
+      padding: 14px; border-radius: 10px;
+      border: 1.5px solid var(--border); background: var(--surface);
+      transition: border-color .2s;
     }
     .tool-card:focus-within { border-color: var(--ht-red); background: #fff; }
-    .tool-card-header {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
-    }
+    .tool-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
     .tool-emoji { font-size: 16px; }
-    .tool-name {
-      font-size: 13px; font-weight: 700; color: var(--text-main);
-    }
-    .tool-field {
-      display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;
-    }
+    .tool-name  { font-size: 13px; font-weight: 700; color: var(--text-main); }
+    .tool-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
     .tool-field:last-child { margin-bottom: 0; }
     .tool-field label {
       font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.07em;
-      color: var(--text-light);
+      text-transform: uppercase; letter-spacing: .07em; color: var(--text-light);
     }
     .tool-field input {
       border: none; outline: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px; font-weight: 500;
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
       color: var(--text-main); background: transparent;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border); padding-bottom: 4px;
     }
     .tool-field input::placeholder { color: var(--text-light); font-weight: 400; }
     .tool-field input:focus { border-bottom-color: var(--ht-purple); }
 
     /* ── FREQ CHIPS ── */
-    .freq-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 7px;
-    }
+    .freq-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 7px; }
     .freq-chip {
-      padding: 6px 14px;
-      border-radius: 100px;
-      border: 1.5px solid var(--border);
-      background: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-sub);
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
-      white-space: nowrap;
-      line-height: 1;
+      padding: 6px 14px; border-radius: 100px;
+      border: 1.5px solid var(--border); background: #fff;
+      font-family: 'Inter', sans-serif; font-size: 12px;
+      font-weight: 500; color: var(--text-sub); cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s, box-shadow .15s;
+      white-space: nowrap; line-height: 1;
     }
-    .freq-chip:hover {
-      border-color: var(--ht-purple);
-      color: var(--ht-purple);
-      background: rgba(180,48,114,0.05);
-    }
+    .freq-chip:hover { border-color: var(--ht-purple); color: var(--ht-purple); background: rgba(180,48,114,.05); }
     .freq-chip.active {
-      background: var(--ht-grad);
-      border-color: transparent;
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 2px 10px rgba(180,48,114,0.28);
+      background: var(--ht-grad); border-color: transparent;
+      color: #fff; font-weight: 600;
+      box-shadow: 0 2px 10px rgba(180,48,114,.28);
     }
 
     /* ── DAYS SECTION ── */
     .freq-days-section {
-      margin-top: 0;
-      padding-top: 0;
+      max-height: 0; opacity: 0; overflow: hidden;
       border-top: 1px dashed transparent;
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: max-height 0.32s ease, opacity 0.25s ease,
-                  margin-top 0.28s ease, padding-top 0.28s ease,
-                  border-color 0.28s ease;
+      transition: max-height .32s ease, opacity .25s ease,
+                  margin-top .28s ease, padding-top .28s ease, border-color .28s ease;
     }
     .freq-days-section.visible {
-      max-height: 100px;
-      opacity: 1;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-color: var(--border);
+      max-height: 100px; opacity: 1;
+      margin-top: 10px; padding-top: 10px; border-color: var(--border);
     }
     .freq-days-hint {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-light);
-      margin-bottom: 7px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--text-light); margin-bottom: 7px;
     }
 
-    /* ── NOTES AREA ── */
+    /* ── PRIORITIES ── */
+    .priority-list { display: flex; flex-direction: column; gap: 10px; }
+    .priority-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 10px;
+      border: 1.5px solid var(--border); background: var(--surface);
+      transition: border-color .2s;
+    }
+    .priority-item:focus-within { border-color: var(--ht-orange); background: #fff; }
+    .priority-num {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--ht-grad); color: #fff;
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .priority-input {
+      flex: 1; border: none; outline: none;
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      font-weight: 500; color: var(--text-main); background: transparent;
+    }
+    .priority-input::placeholder { color: var(--text-light); font-weight: 400; }
+
+    /* ── NOTES ── */
     .notes-area {
-      width: 100%;
-      min-height: 90px;
-      border: none;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      color: var(--text-main);
-      background: transparent;
-      resize: vertical;
-      line-height: 1.7;
+      width: 100%; min-height: 90px; border: none; outline: none;
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      color: var(--text-main); background: transparent;
+      resize: vertical; line-height: 1.7;
     }
     .notes-area::placeholder { color: var(--text-light); }
 
-    /* ── BUTTONS ── */
-    .btn-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Sidebar toggle (header) */
-    .sidebar-toggle-hdr {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background 0.18s, transform 0.15s;
-      flex-shrink: 0;
-    }
-    .sidebar-toggle-hdr:hover { background: rgba(255,255,255,0.22); }
-
-    /* Save to DB button */
-    .save-db-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background 0.18s, transform 0.15s;
-      flex-shrink: 0;
-    }
-    .save-db-btn:hover { background: rgba(255,255,255,0.22); transform: scale(1.08); }
-    .save-db-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .download-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--ht-grad);
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
-      flex-shrink: 0;
-    }
-    .download-btn:hover { opacity: 0.88; transform: scale(1.08); }
-    .download-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
     /* ── TOAST ── */
     .toast {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
+      position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: #1A1535;
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 12px 22px;
-      border-radius: 100px;
-      box-shadow: 0 8px 32px rgba(17,14,39,0.25);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      z-index: 9999;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      pointer-events: none;
+      background: #1A1535; color: #fff;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+      padding: 11px 20px; border-radius: 100px;
+      box-shadow: 0 8px 32px rgba(17,14,39,.25);
+      display: flex; align-items: center; gap: 8px;
+      z-index: 9999; pointer-events: none;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--ht-grad-h);
-      flex-shrink: 0;
-    }
+    .toast-dot { width:8px; height:8px; border-radius:50%; background:var(--ht-grad-h); flex-shrink:0; }
 
     /* ── FOOTER ── */
     .footer {
-      background: var(--ht-dark);
-      text-align: center;
-      padding: 20px 32px;
-      position: relative;
-      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--ht-dark); text-align: center;
+      padding: 16px 32px; position: relative; overflow: hidden;
     }
     .footer::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 100%, rgba(180,48,114,0.25) 0%, transparent 70%);
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, rgba(180,48,114,.22) 0%, transparent 70%);
       pointer-events: none;
     }
-    .footer-text {
-      color: rgba(255,255,255,0.35);
-      font-size: 12px;
-      position: relative;
-      z-index: 1;
-    }
+    .footer-text { color: rgba(255,255,255,.30); font-size: 12px; position: relative; z-index:1; }
     .footer-text strong {
       background: var(--ht-grad-h);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-weight: 700;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; font-weight: 700;
     }
 
-    /* ── PRINT ── */
+    /* ── PRINT / PDF ── */
     @media print {
-      body { background: #fff; }
+      body { height: auto; overflow: visible; display: block; background: #fff; }
+      .sidebar, .main-topbar, .btn-row, .footer { display: none !important; }
+      .page-shell { display: block; }
+      .main-scroll { overflow: visible; }
       .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
-      .download-btn, .save-btn, .btn-row, .sidebar, .main-topbar { display: none !important; }
       .header::before { display: none; }
-      .meta-select { color: #000; }
-      input, textarea { color: #000 !important; }
-      .app-layout { display: block; }
+      input, textarea, .meta-select { color: #000 !important; }
     }
 
+    /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
+      body { overflow: auto; height: auto; }
+      .page-shell { overflow: visible; flex-direction: column; }
       .sidebar {
-        position: fixed;
-        height: 100vh;
-        z-index: 200;
+        position: fixed; left: 0; top: 0; height: 100vh;
+        z-index: 200; transform: translateX(0);
+        transition: transform .3s cubic-bezier(.4,0,.2,1), width .3s;
       }
-      .sidebar.collapsed { width: 0; min-width: 0; }
-      .header-inner { padding: 24px 18px 20px; }
-      .content { padding: 0 18px 48px; }
-      .tool-grid, .schedule-grid { grid-template-columns: 1fr; }
-      .header-title { font-size: 22px; }
-      .meta-bar { gap: 8px; }
-      .meta-field { min-width: 140px; }
-      .btn-row { flex-wrap: wrap; }
-      .main-topbar { padding: 14px 18px 0; }
+      .sidebar.collapsed { transform: translateX(-100%); width: var(--sidebar-w); }
+      .main-scroll { overflow: visible; }
+      .header-inner { padding: 20px 16px 16px; }
+      .content { padding: 0 16px 40px; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .main-topbar { padding: 12px 16px 0; }
     }
   </style>
 </head>
 <body>
 
-<!-- TOAST -->
+<!-- ── TOAST ── -->
 <div class="toast" id="toast">
   <div class="toast-dot"></div>
-  <span id="toast-msg">Agenda saved!</span>
+  <span id="toast-msg">Saved!</span>
 </div>
 
-<!-- ═══════════════ HEADER ═══════════════ -->
-<div class="header" id="page-header">
+<!-- ══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════ -->
+<div class="header">
   <div class="header-inner">
     <div class="header-top">
+      <!-- Logo -->
       <div class="logo-wrap">
-        <svg fill="none" height="36" viewBox="0 0 399 72" xmlns="http://www.w3.org/2000/svg">
-          <g clip-path="url(#hta)">
-            <mask height="72" id="htb" maskUnits="userSpaceOnUse" width="399" x="0" y="0">
-              <path d="M399 0H0V72H399V0Z" fill="#fff"/>
-            </mask>
-            <g mask="url(#htb)">
-              <path d="M0 71.6668H10.8537L25.1803 34.3255L39.9346 71.6668H50.3605L31.256 24.6638H18.6695L0 71.6668Z" fill="url(#htc)"/>
-              <path d="M20.2539 17.5048H30.3405V10.0185H82.9708V61.9818H54.0225L57.9706 71.667H93.0577V0.333252H20.2539V17.5048Z" fill="#fff"/>
-              <path d="M128.564 21.8206C130.423 21.8206 132.156 22.2139 133.77 23.0006C135.38 23.7873 136.776 24.8569 137.953 26.2181C139.13 27.5793 140.048 29.166 140.709 30.9868C141.374 32.8077 141.702 34.7523 141.702 36.8162V51.1224H134.024V45.894C134.024 44.44 134.033 42.9374 134.05 41.3816C134.067 39.8304 134.077 38.5001 134.077 37.3908C134.077 36.3168 133.905 35.265 133.56 34.2308C133.219 33.1966 132.742 32.2861 132.134 31.5039C131.525 30.7172 130.813 30.0852 129.99 29.6079C129.172 29.1306 128.305 28.8875 127.392 28.8875C126.516 28.8875 125.676 29.051 124.88 29.3736C124.08 29.7007 123.375 30.178 122.767 30.81C122.159 31.4421 121.673 32.2376 121.31 33.1966C120.947 34.1556 120.768 35.2826 120.768 36.5864V51.1224H112.919V9.18066H120.768L120.824 24.8082C121.809 23.8492 122.937 23.1156 124.211 22.5984C125.484 22.0769 126.932 21.8206 128.564 21.8206Z" fill="#fff"/>
-              <path d="M159.162 21.8206C161.285 21.8206 163.218 22.2493 164.964 23.1111C166.709 23.9729 168.205 25.1043 169.457 26.5009C170.708 27.8975 171.675 29.5063 172.357 31.3271C173.04 33.148 173.381 35.013 173.381 36.9311C173.381 38.0802 173.228 39.3044 172.926 40.6082H152.792C153.55 41.912 154.63 43.0124 156.034 43.9096C157.434 44.8112 158.953 45.2576 160.585 45.2576C162.216 45.2576 163.647 45.125 164.876 44.8554C166.11 44.5858 167.274 44.2455 168.376 43.8212L170.992 48.7048C169.588 49.6992 167.987 50.4683 166.185 51.003C164.382 51.5378 162.461 51.8074 160.409 51.8074C158.174 51.8074 156.087 51.414 154.153 50.6274C152.22 49.8407 150.531 48.78 149.091 47.4408C147.652 46.1017 146.514 44.5106 145.679 42.6722C144.848 40.838 144.432 38.8846 144.432 36.8162C144.432 34.7876 144.812 32.8606 145.57 31.0442C146.326 29.2234 147.381 27.6367 148.728 26.2755C150.076 24.9143 151.637 23.8359 153.418 23.0316C155.199 22.2227 157.115 21.8206 159.162 21.8206ZM165.59 34.4606C165.135 32.8121 164.321 31.4729 163.144 30.4388C161.967 29.4046 160.641 28.8875 159.162 28.8875C157.644 28.8875 156.271 29.4046 155.041 30.4388C153.808 31.4729 152.963 32.8121 152.513 34.4606H165.59Z" fill="#fff"/>
-              <path d="M208.587 22.6249V51.1223H201.819L201.023 48.0773C199.924 49.5711 198.603 50.5655 197.067 51.0649C195.532 51.5643 193.931 51.8118 192.259 51.8118C190.251 51.8118 188.401 51.4185 186.716 50.6318C185.027 49.8451 183.562 48.7756 182.306 47.4143C181.055 46.0531 180.08 44.4665 179.38 42.6456C178.675 40.8248 178.325 38.8802 178.325 36.8117C178.325 34.7434 178.675 32.7988 179.38 30.9824C180.08 29.1615 181.055 27.5749 182.306 26.2136C183.557 24.8524 185.027 23.7828 186.716 22.9962C188.405 22.2095 190.251 21.8162 192.259 21.8162C194.079 21.8162 195.747 22.1034 197.265 22.6779C198.778 23.2525 200.034 24.1718 201.018 25.4358L201.814 22.6205H208.587V22.6249ZM200.738 36.9311C200.738 35.4373 200.537 34.1821 200.139 33.1657C199.741 32.1491 199.211 31.3271 198.546 30.6951C197.881 30.0631 197.107 29.6035 196.214 29.3161C195.322 29.0289 194.368 28.8831 193.345 28.8831C192.321 28.8831 191.363 29.0952 190.47 29.515C189.578 29.9349 188.794 30.5006 188.108 31.2077C187.425 31.9149 186.896 32.759 186.515 33.7357C186.135 34.7124 185.946 35.7378 185.946 36.8117C185.946 37.9211 186.135 38.9553 186.515 39.9143C186.896 40.8734 187.425 41.7042 188.108 42.4158C188.79 43.1229 189.578 43.6886 190.47 44.1085C191.363 44.5328 192.316 44.7405 193.345 44.7405C195.392 44.7405 197.125 44.0996 198.546 42.8136C199.968 41.5363 200.699 39.574 200.738 36.9311Z" fill="#fff"/>
-              <path d="M229.967 21.8206C231.975 21.8206 233.835 22.2139 235.541 23.0006C237.247 23.7873 238.717 24.8568 239.947 26.2181C241.18 27.5793 242.148 29.1659 242.847 30.9868C243.547 32.8076 243.898 34.7522 243.898 36.8162C243.898 38.8846 243.547 40.8292 242.847 42.65C242.143 44.4709 241.176 46.0575 239.947 47.4188C238.713 48.78 237.247 49.8496 235.541 50.6362C233.835 51.4229 231.975 51.8162 229.967 51.8162C228.335 51.8162 226.743 51.5202 225.19 50.9235C223.636 50.3313 222.421 49.5755 221.55 48.6562V62.5028H213.701V22.6249H220.412L221.55 24.5784C222.648 23.584 223.882 22.8724 225.246 22.4526C226.612 22.0283 228.187 21.8206 229.967 21.8206ZM228.943 44.7449C229.967 44.7449 230.926 44.5372 231.814 44.1129C232.706 43.6931 233.48 43.1274 234.146 42.4202C234.81 41.7131 235.34 40.8778 235.738 39.9187C236.136 38.9597 236.333 37.9255 236.333 36.8162C236.333 35.7423 236.132 34.7169 235.738 33.7402C235.34 32.7634 234.806 31.9193 234.146 31.2122C233.48 30.505 232.706 29.9393 231.814 29.5195C230.921 29.0996 229.967 28.8875 228.943 28.8875C227.92 28.8875 226.962 29.0333 226.069 29.3206C225.176 29.6079 224.402 30.0675 223.738 30.6995C223.072 31.3315 222.552 32.1536 222.171 33.17C221.791 34.1865 221.602 35.4019 221.602 36.8162C221.602 38.1553 221.791 39.3177 222.171 40.2944C222.552 41.2711 223.072 42.0932 223.738 42.765C224.402 43.4367 225.176 43.9317 226.069 44.2588C226.962 44.5814 227.92 44.7449 228.943 44.7449Z" fill="#fff"/>
-              <path d="M258.89 44.0513C259.704 44.7806 260.776 45.1474 262.106 45.1474C263.165 45.1474 264.228 44.9397 265.291 44.5154V51.1315C264.342 51.4364 263.34 51.6928 262.277 51.9005C261.214 52.1082 260.155 52.2143 259.092 52.2143C257.88 52.2143 256.721 52.0596 255.622 51.7546C254.524 51.4497 253.536 50.9194 252.665 50.1725C251.79 49.4255 251.099 48.4311 250.587 47.1848C250.075 45.9385 249.821 44.4005 249.821 42.5619V29.6922H245.783V24.3489L249.821 22.6253V16.2478H257.67V22.6253H265.291V29.6922H257.67V40.94C257.665 42.2835 258.072 43.3221 258.89 44.0513Z" fill="#fff"/>
-              <path d="M276.775 26.5892C277.156 25.9749 277.589 25.3915 278.084 24.8346C278.578 24.2778 279.164 23.7828 279.847 23.3408C280.53 22.8988 281.308 22.5452 282.179 22.2801C283.05 22.0105 284.038 21.8779 285.136 21.8779C286.427 21.8779 287.923 22.1077 289.629 22.5674L288.89 29.6343C288.474 29.5591 288.055 29.4619 287.639 29.347C287.297 29.2719 286.917 29.2011 286.501 29.1437C286.086 29.0863 285.705 29.0597 285.364 29.0597C284.152 29.0597 283.023 29.2321 281.978 29.5768C280.936 29.9215 280.035 30.3988 279.278 31.0132C278.521 31.6275 277.913 32.3656 277.458 33.223C277.003 34.0848 276.775 35.0129 276.775 36.0117V51.1222H268.927V22.6248H276.036L276.775 26.5892Z" fill="#fff"/>
-              <path d="M321.991 22.6249V51.1223H315.223L314.427 48.0773C313.328 49.5711 312.007 50.5655 310.471 51.0649C308.936 51.5643 307.335 51.8118 305.663 51.8118C303.656 51.8118 301.805 51.4185 300.121 50.6318C298.431 49.8451 296.966 48.7756 295.71 47.4143C294.459 46.0531 293.484 44.4665 292.783 42.6456C292.079 40.8248 291.729 38.8802 291.729 36.8117C291.729 34.7434 292.079 32.7988 292.783 30.9824C293.484 29.1615 294.459 27.5749 295.71 26.2136C296.962 24.8524 298.431 23.7828 300.121 22.9962C301.809 22.2095 303.656 21.8162 305.663 21.8162C307.484 21.8162 309.15 22.1034 310.669 22.6779C312.183 23.2525 313.438 24.1718 314.422 25.4358L315.219 22.6205H321.991V22.6249ZM314.142 36.9311C314.142 35.4373 313.941 34.1821 313.543 33.1657C313.144 32.1491 312.616 31.3271 311.95 30.6951C311.285 30.0631 310.511 29.6035 309.619 29.3161C308.726 29.0289 307.772 28.8831 306.748 28.8831C305.725 28.8831 304.767 29.0952 303.874 29.515C302.982 29.9349 302.198 30.5006 301.511 31.2077C300.829 31.9149 300.3 32.759 299.919 33.7357C299.538 34.7124 299.351 35.7378 299.351 36.8117C299.351 37.9211 299.538 38.9553 299.919 39.9143C300.3 40.8734 300.829 41.7042 301.511 42.4158C302.194 43.1229 302.982 43.6886 303.874 44.1085C304.767 44.5328 305.721 44.7405 306.748 44.7405C308.796 44.7405 310.529 44.0996 311.95 42.8136C313.377 41.5363 314.103 39.574 314.142 36.9311Z" fill="#fff"/>
-              <path d="M340.931 28.8874C339.981 28.8874 339.089 29.1084 338.257 29.5504C337.422 29.9923 336.691 30.5845 336.07 31.3315C335.448 32.0784 334.95 32.949 334.591 33.9478C334.228 34.9422 334.049 36.0162 334.049 37.1653C334.049 38.3144 334.228 39.3574 334.591 40.2988C334.95 41.2357 335.444 42.0401 336.07 42.7118C336.695 43.3836 337.426 43.9095 338.257 44.2941C339.093 44.6786 339.981 44.8686 340.931 44.8686C342.103 44.8686 343.254 44.5902 344.37 44.0377C345.489 43.4808 346.447 42.7074 347.244 41.7131L352.078 46.5392C350.752 48.1479 349.12 49.4296 347.187 50.3887C345.253 51.3477 343.166 51.825 340.931 51.825C338.883 51.825 336.967 51.4316 335.186 50.645C333.402 49.8583 331.848 48.7888 330.523 47.4275C329.192 46.0663 328.143 44.4797 327.368 42.6588C326.589 40.838 326.2 38.8933 326.2 36.825C326.2 34.7566 326.589 32.812 327.368 30.9956C328.143 29.1747 329.197 27.5881 330.523 26.2269C331.848 24.8656 333.402 23.7961 335.186 23.0094C336.967 22.2227 338.883 21.8293 340.931 21.8293C343.245 21.8293 345.384 22.3288 347.358 23.3232C349.331 24.3176 350.997 25.6788 352.362 27.4024L346.902 31.654C345.804 30.6199 344.807 29.8995 343.915 29.4973C343.026 29.0863 342.029 28.8874 340.931 28.8874Z" fill="#fff"/>
-              <path d="M370.278 21.8206C372.4 21.8206 374.334 22.2493 376.079 23.1111C377.825 23.9729 379.321 25.1043 380.573 26.5009C381.824 27.8975 382.791 29.5063 383.473 31.3271C384.156 33.148 384.497 35.013 384.497 36.9311C384.497 38.0802 384.344 39.3044 384.042 40.6082H363.908C364.665 41.912 365.746 43.0124 367.15 43.9096C368.554 44.8112 370.068 45.2576 371.7 45.2576C373.332 45.2576 374.762 45.125 375.992 44.8554C377.226 44.5858 378.389 44.2455 379.492 43.8212L382.108 48.7048C380.704 49.6992 379.103 50.4683 377.3 51.003C375.498 51.5378 373.577 51.8074 371.525 51.8074C369.289 51.8074 367.203 51.414 365.269 50.6274C363.335 49.8407 361.647 48.78 360.207 47.4408C358.768 46.1017 357.626 44.5106 356.795 42.6722C355.959 40.8336 355.543 38.8801 355.543 36.8118C355.543 34.7832 355.924 32.8563 356.681 31.0398C357.437 29.2189 358.492 27.6323 359.835 26.2711C361.182 24.9099 362.744 23.8315 364.529 23.0271C366.315 22.2227 368.23 21.8206 370.278 21.8206ZM376.705 34.4606C376.25 32.8121 375.436 31.4729 374.259 30.4388C373.082 29.4046 371.757 28.8875 370.278 28.8875C368.76 28.8875 367.386 29.4046 366.157 30.4388C364.923 31.4729 364.078 32.8121 363.624 34.4606H376.705Z" fill="#fff"/>
-              <path d="M394.646 42.7915C395.85 42.7915 396.878 43.2158 397.726 44.0643C398.575 44.9129 399 45.9515 399 47.1845C399 48.4176 398.575 49.4607 397.726 50.3092C396.878 51.1578 395.854 51.582 394.646 51.582C393.443 51.582 392.424 51.1578 391.597 50.3092C390.766 49.4607 390.354 48.4176 390.354 47.1845C390.354 45.9515 390.77 44.9084 391.597 44.0643C392.424 43.2158 393.443 42.7915 394.646 42.7915Z" fill="url(#htd)"/>
-            </g>
-          </g>
-          <defs>
-            <linearGradient gradientUnits="userSpaceOnUse" id="htc" x1="-2.428" x2="43.196" y1="29.76" y2="75.187">
-              <stop stop-color="#F27121"/><stop offset=".5" stop-color="#E94057"/>
-              <stop offset=".513" stop-color="#E63F59"/><stop offset=".736" stop-color="#B43072"/>
-              <stop offset=".905" stop-color="#962781"/><stop offset="1" stop-color="#8A2387"/>
-            </linearGradient>
-            <linearGradient gradientUnits="userSpaceOnUse" id="htd" x1="390.354" x2="398.999" y1="47.185" y2="47.185">
-              <stop stop-color="#F27121"/><stop offset=".5" stop-color="#E94057"/>
-              <stop offset=".513" stop-color="#E63F59"/><stop offset=".736" stop-color="#B43072"/>
-              <stop offset=".905" stop-color="#962781"/><stop offset="1" stop-color="#8A2387"/>
-            </linearGradient>
-            <clipPath id="hta"><path d="M0 0H399V72H0z" fill="#fff"/></clipPath>
-          </defs>
+        <svg fill="none" height="32" viewBox="0 0 399 72" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#hta)"><mask height="72" id="htb" maskUnits="userSpaceOnUse" width="399" x="0" y="0"><path d="M399 0H0V72H399V0Z" fill="#fff"/></mask><g mask="url(#htb)"><path d="M0 71.6668H10.8537L25.1803 34.3255L39.9346 71.6668H50.3605L31.256 24.6638H18.6695L0 71.6668Z" fill="url(#htc)"/><path d="M20.2539 17.5048H30.3405V10.0185H82.9708V61.9818H54.0225L57.9706 71.667H93.0577V0.333252H20.2539V17.5048Z" fill="#fff"/><path d="M128.564 21.8206C130.423 21.8206 132.156 22.2139 133.77 23.0006C135.38 23.7873 136.776 24.8569 137.953 26.2181C139.13 27.5793 140.048 29.166 140.709 30.9868C141.374 32.8077 141.702 34.7523 141.702 36.8162V51.1224H134.024V45.894C134.024 44.44 134.033 42.9374 134.05 41.3816C134.067 39.8304 134.077 38.5001 134.077 37.3908C134.077 36.3168 133.905 35.265 133.56 34.2308C133.219 33.1966 132.742 32.2861 132.134 31.5039C131.525 30.7172 130.813 30.0852 129.99 29.6079C129.172 29.1306 128.305 28.8875 127.392 28.8875C126.516 28.8875 125.676 29.051 124.88 29.3736C124.08 29.7007 123.375 30.178 122.767 30.81C122.159 31.4421 121.673 32.2376 121.31 33.1966C120.947 34.1556 120.768 35.2826 120.768 36.5864V51.1224H112.919V9.18066H120.768L120.824 24.8082C121.809 23.8492 122.937 23.1156 124.211 22.5984C125.484 22.0769 126.932 21.8206 128.564 21.8206Z" fill="#fff"/><path d="M159.162 21.8206C161.285 21.8206 163.218 22.2493 164.964 23.1111C166.709 23.9729 168.205 25.1043 169.457 26.5009C170.708 27.8975 171.675 29.5063 172.357 31.3271C173.04 33.148 173.381 35.013 173.381 36.9311C173.381 38.0802 173.228 39.3044 172.926 40.6082H152.792C153.55 41.912 154.63 43.0124 156.034 43.9096C157.434 44.8112 158.953 45.2576 160.585 45.2576C162.216 45.2576 163.647 45.125 164.876 44.8554C166.11 44.5858 167.274 44.2455 168.376 43.8212L170.992 48.7048C169.588 49.6992 167.987 50.4683 166.185 51.003C164.382 51.5378 162.461 51.8074 160.409 51.8074C158.174 51.8074 156.087 51.414 154.153 50.6274C152.22 49.8407 150.531 48.78 149.091 47.4408C147.652 46.1017 146.514 44.5106 145.679 42.6722C144.848 40.838 144.432 38.8846 144.432 36.8162C144.432 34.7876 144.812 32.8606 145.57 31.0442C146.326 29.2234 147.381 27.6367 148.728 26.2755C150.076 24.9143 151.637 23.8359 153.418 23.0316C155.199 22.2227 157.115 21.8206 159.162 21.8206ZM165.59 34.4606C165.135 32.8121 164.321 31.4729 163.144 30.4388C161.967 29.4046 160.641 28.8875 159.162 28.8875C157.644 28.8875 156.271 29.4046 155.041 30.4388C153.808 31.4729 152.963 32.8121 152.513 34.4606H165.59Z" fill="#fff"/><path d="M208.587 22.6249V51.1223H201.819L201.023 48.0773C199.924 49.5711 198.603 50.5655 197.067 51.0649C195.532 51.5643 193.931 51.8118 192.259 51.8118C190.251 51.8118 188.401 51.4185 186.716 50.6318C185.027 49.8451 183.562 48.7756 182.306 47.4143C181.055 46.0531 180.08 44.4665 179.38 42.6456C178.675 40.8248 178.325 38.8802 178.325 36.8117C178.325 34.7434 178.675 32.7988 179.38 30.9824C180.08 29.1615 181.055 27.5749 182.306 26.2136C183.557 24.8524 185.027 23.7828 186.716 22.9962C188.405 22.2095 190.251 21.8162 192.259 21.8162C194.079 21.8162 195.747 22.1034 197.265 22.6779C198.778 23.2525 200.034 24.1718 201.018 25.4358L201.814 22.6205H208.587V22.6249ZM200.738 36.9311C200.738 35.4373 200.537 34.1821 200.139 33.1657C199.741 32.1491 199.211 31.3271 198.546 30.6951C197.881 30.0631 197.107 29.6035 196.214 29.3161C195.322 29.0289 194.368 28.8831 193.345 28.8831C192.321 28.8831 191.363 29.0952 190.47 29.515C189.578 29.9349 188.794 30.5006 188.108 31.2077C187.425 31.9149 186.896 32.759 186.515 33.7357C186.135 34.7124 185.946 35.7378 185.946 36.8117C185.946 37.9211 186.135 38.9553 186.515 39.9143C186.896 40.8734 187.425 41.7042 188.108 42.4158C188.79 43.1229 189.578 43.6886 190.47 44.1085C191.363 44.5328 192.316 44.7405 193.345 44.7405C195.392 44.7405 197.125 44.0996 198.546 42.8136C199.968 41.5363 200.699 39.574 200.738 36.9311Z" fill="#fff"/><path d="M229.967 21.8206C231.975 21.8206 233.835 22.2139 235.541 23.0006C237.247 23.7873 238.717 24.8568 239.947 26.2181C241.18 27.5793 242.148 29.1659 242.847 30.9868C243.547 32.8076 243.898 34.7522 243.898 36.8162C243.898 38.8846 243.547 40.8292 242.847 42.65C242.143 44.4709 241.176 46.0575 239.947 47.4188C238.713 48.78 237.247 49.8496 235.541 50.6362C233.835 51.4229 231.975 51.8162 229.967 51.8162C228.335 51.8162 226.743 51.5202 225.19 50.9235C223.636 50.3313 222.421 49.5755 221.55 48.6562V62.5028H213.701V22.6249H220.412L221.55 24.5784C222.648 23.584 223.882 22.8724 225.246 22.4526C226.612 22.0283 228.187 21.8206 229.967 21.8206ZM228.943 44.7449C229.967 44.7449 230.926 44.5372 231.814 44.1129C232.706 43.6931 233.48 43.1274 234.146 42.4202C234.81 41.7131 235.34 40.8778 235.738 39.9187C236.136 38.9597 236.333 37.9255 236.333 36.8162C236.333 35.7423 236.132 34.7169 235.738 33.7402C235.34 32.7634 234.806 31.9193 234.146 31.2122C233.48 30.505 232.706 29.9393 231.814 29.5195C230.921 29.0996 229.967 28.8875 228.943 28.8875C227.92 28.8875 226.962 29.0333 226.069 29.3206C225.176 29.6079 224.402 30.0675 223.738 30.6995C223.072 31.3315 222.552 32.1536 222.171 33.17C221.791 34.1865 221.602 35.4019 221.602 36.8162C221.602 38.1553 221.791 39.3177 222.171 40.2944C222.552 41.2711 223.072 42.0932 223.738 42.765C224.402 43.4367 225.176 43.9317 226.069 44.2588C226.962 44.5814 227.92 44.7449 228.943 44.7449Z" fill="#fff"/><path d="M258.89 44.0513C259.704 44.7806 260.776 45.1474 262.106 45.1474C263.165 45.1474 264.228 44.9397 265.291 44.5154V51.1315C264.342 51.4364 263.34 51.6928 262.277 51.9005C261.214 52.1082 260.155 52.2143 259.092 52.2143C257.88 52.2143 256.721 52.0596 255.622 51.7546C254.524 51.4497 253.536 50.9194 252.665 50.1725C251.79 49.4255 251.099 48.4311 250.587 47.1848C250.075 45.9385 249.821 44.4005 249.821 42.5619V29.6922H245.783V24.3489L249.821 22.6253V16.2478H257.67V22.6253H265.291V29.6922H257.67V40.94C257.665 42.2835 258.072 43.3221 258.89 44.0513Z" fill="#fff"/><path d="M276.775 26.5892C277.156 25.9749 277.589 25.3915 278.084 24.8346C278.578 24.2778 279.164 23.7828 279.847 23.3408C280.53 22.8988 281.308 22.5452 282.179 22.2801C283.05 22.0105 284.038 21.8779 285.136 21.8779C286.427 21.8779 287.923 22.1077 289.629 22.5674L288.89 29.6343C288.474 29.5591 288.055 29.4619 287.639 29.347C287.297 29.2719 286.917 29.2011 286.501 29.1437C286.086 29.0863 285.705 29.0597 285.364 29.0597C284.152 29.0597 283.023 29.2321 281.978 29.5768C280.936 29.9215 280.035 30.3988 279.278 31.0132C278.521 31.6275 277.913 32.3656 277.458 33.223C277.003 34.0848 276.775 35.0129 276.775 36.0117V51.1222H268.927V22.6248H276.036L276.775 26.5892Z" fill="#fff"/><path d="M321.991 22.6249V51.1223H315.223L314.427 48.0773C313.328 49.5711 312.007 50.5655 310.471 51.0649C308.936 51.5643 307.335 51.8118 305.663 51.8118C303.656 51.8118 301.805 51.4185 300.121 50.6318C298.431 49.8451 296.966 48.7756 295.71 47.4143C294.459 46.0531 293.484 44.4665 292.783 42.6456C292.079 40.8248 291.729 38.8802 291.729 36.8117C291.729 34.7434 292.079 32.7988 292.783 30.9824C293.484 29.1615 294.459 27.5749 295.71 26.2136C296.962 24.8524 298.431 23.7828 300.121 22.9962C301.809 22.2095 303.656 21.8162 305.663 21.8162C307.484 21.8162 309.15 22.1034 310.669 22.6779C312.183 23.2525 313.438 24.1718 314.422 25.4358L315.219 22.6205H321.991V22.6249ZM314.142 36.9311C314.142 35.4373 313.941 34.1821 313.543 33.1657C313.144 32.1491 312.616 31.3271 311.95 30.6951C311.285 30.0631 310.511 29.6035 309.619 29.3161C308.726 29.0289 307.772 28.8831 306.748 28.8831C305.725 28.8831 304.767 29.0952 303.874 29.515C302.982 29.9349 302.198 30.5006 301.511 31.2077C300.829 31.9149 300.3 32.759 299.919 33.7357C299.538 34.7124 299.351 35.7378 299.351 36.8117C299.351 37.9211 299.538 38.9553 299.919 39.9143C300.3 40.8734 300.829 41.7042 301.511 42.4158C302.194 43.1229 302.982 43.6886 303.874 44.1085C304.767 44.5328 305.721 44.7405 306.748 44.7405C308.796 44.7405 310.529 44.0996 311.95 42.8136C313.377 41.5363 314.103 39.574 314.142 36.9311Z" fill="#fff"/><path d="M340.931 28.8874C339.981 28.8874 339.089 29.1084 338.257 29.5504C337.422 29.9923 336.691 30.5845 336.07 31.3315C335.448 32.0784 334.95 32.949 334.591 33.9478C334.228 34.9422 334.049 36.0162 334.049 37.1653C334.049 38.3144 334.228 39.3574 334.591 40.2988C334.95 41.2357 335.444 42.0401 336.07 42.7118C336.695 43.3836 337.426 43.9095 338.257 44.2941C339.093 44.6786 339.981 44.8686 340.931 44.8686C342.103 44.8686 343.254 44.5902 344.37 44.0377C345.489 43.4808 346.447 42.7074 347.244 41.7131L352.078 46.5392C350.752 48.1479 349.12 49.4296 347.187 50.3887C345.253 51.3477 343.166 51.825 340.931 51.825C338.883 51.825 336.967 51.4316 335.186 50.645C333.402 49.8583 331.848 48.7888 330.523 47.4275C329.192 46.0663 328.143 44.4797 327.368 42.6588C326.589 40.838 326.2 38.8933 326.2 36.825C326.2 34.7566 326.589 32.812 327.368 30.9956C328.143 29.1747 329.197 27.5881 330.523 26.2269C331.848 24.8656 333.402 23.7961 335.186 23.0094C336.967 22.2227 338.883 21.8293 340.931 21.8293C343.245 21.8293 345.384 22.3288 347.358 23.3232C349.331 24.3176 350.997 25.6788 352.362 27.4024L346.902 31.654C345.804 30.6199 344.807 29.8995 343.915 29.4973C343.026 29.0863 342.029 28.8874 340.931 28.8874Z" fill="#fff"/><path d="M370.278 21.8206C372.4 21.8206 374.334 22.2493 376.079 23.1111C377.825 23.9729 379.321 25.1043 380.573 26.5009C381.824 27.8975 382.791 29.5063 383.473 31.3271C384.156 33.148 384.497 35.013 384.497 36.9311C384.497 38.0802 384.344 39.3044 384.042 40.6082H363.908C364.665 41.912 365.746 43.0124 367.15 43.9096C368.554 44.8112 370.068 45.2576 371.7 45.2576C373.332 45.2576 374.762 45.125 375.992 44.8554C377.226 44.5858 378.389 44.2455 379.492 43.8212L382.108 48.7048C380.704 49.6992 379.103 50.4683 377.3 51.003C375.498 51.5378 373.577 51.8074 371.525 51.8074C369.289 51.8074 367.203 51.414 365.269 50.6274C363.335 49.8407 361.647 48.78 360.207 47.4408C358.768 46.1017 357.626 44.5106 356.795 42.6722C355.959 40.8336 355.543 38.8801 355.543 36.8118C355.543 34.7832 355.924 32.8563 356.681 31.0398C357.437 29.2189 358.492 27.6323 359.835 26.2711C361.182 24.9099 362.744 23.8315 364.529 23.0271C366.315 22.2227 368.23 21.8206 370.278 21.8206ZM376.705 34.4606C376.25 32.8121 375.436 31.4729 374.259 30.4388C373.082 29.4046 371.757 28.8875 370.278 28.8875C368.76 28.8875 367.386 29.4046 366.157 30.4388C364.923 31.4729 364.078 32.8121 363.624 34.4606H376.705Z" fill="#fff"/><path d="M394.646 42.7915C395.85 42.7915 396.878 43.2158 397.726 44.0643C398.575 44.9129 399 45.9515 399 47.1845C399 48.4176 398.575 49.4607 397.726 50.3092C396.878 51.1578 395.854 51.582 394.646 51.582C393.443 51.582 392.424 51.1578 391.597 50.3092C390.766 49.4607 390.354 48.4176 390.354 47.1845C390.354 45.9515 390.77 44.9084 391.597 44.0643C392.424 43.2158 393.443 42.7915 394.646 42.7915Z" fill="url(#htd)"/></g></g>
+          <defs><linearGradient gradientUnits="userSpaceOnUse" id="htc" x1="-2.428" x2="43.196" y1="29.76" y2="75.187"><stop stop-color="#F27121"/><stop offset=".5" stop-color="#E94057"/><stop offset=".513" stop-color="#E63F59"/><stop offset=".736" stop-color="#B43072"/><stop offset=".905" stop-color="#962781"/><stop offset="1" stop-color="#8A2387"/></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="htd" x1="390.354" x2="398.999" y1="47.185" y2="47.185"><stop stop-color="#F27121"/><stop offset=".5" stop-color="#E94057"/><stop offset=".513" stop-color="#E63F59"/><stop offset=".736" stop-color="#B43072"/><stop offset=".905" stop-color="#962781"/><stop offset="1" stop-color="#8A2387"/></linearGradient><clipPath id="hta"><path d="M0 0H399V72H0z" fill="#fff"/></clipPath></defs>
         </svg>
       </div>
+
+      <!-- Action buttons -->
       <div class="btn-row">
         <div class="badge"><div class="badge-dot"></div>Client Kickoff</div>
 
-        <!-- Sidebar toggle -->
-        <button class="sidebar-toggle-hdr" id="sidebar-toggle-hdr" onclick="toggleSidebar()" title="Toggle client panel">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+        <!-- Toggle sidebar -->
+        <button class="hdr-btn open" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle client panel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2.5"/>
+            <path d="M9 3v18"/>
+          </svg>
         </button>
 
         <!-- Save to Supabase -->
-        <button class="save-db-btn" id="save-db-btn" onclick="saveToDatabase()" title="Save to Database">
+        <button class="hdr-btn" id="save-db-btn" onclick="saveToDatabase()" title="Save to Database">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
         </button>
 
         <!-- Download PDF -->
-        <button class="download-btn" id="download-btn" onclick="downloadPDF()" title="Download PDF">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <button class="hdr-btn gradient" id="download-btn" onclick="downloadPDF()" title="Download PDF">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
       </div>
     </div>
 
-    <div class="header-title">
-      Kickoff Meeting <span>Agenda</span>
-    </div>
+    <div class="header-title">Kickoff Meeting <span>Agenda</span></div>
     <div class="header-sub">Confidential &nbsp;·&nbsp; Heaptrace Technology</div>
 
-    <!-- Meeting meta fields -->
     <div class="meta-bar">
       <div class="meta-field">
         <label>Client</label>
-        <input id="meta-client" type="text" placeholder="Client / Company name" />
+        <input id="meta-client" type="text" placeholder="Client / Company name" autocomplete="off"/>
       </div>
       <div class="meta-field">
         <label>Date</label>
-        <input id="meta-date" type="date" />
+        <input id="meta-date" type="date"/>
       </div>
       <div class="meta-field">
         <label>Engagement</label>
@@ -936,55 +673,72 @@
 </div>
 <div class="grad-bar"></div>
 
-<!-- ═══════════════ APP LAYOUT ═══════════════ -->
-<div class="app-layout">
+<!-- ══════════════════════════════════════════
+     PAGE SHELL  (sidebar + main)
+══════════════════════════════════════════ -->
+<div class="page-shell">
 
   <!-- ── SIDEBAR ── -->
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar open" id="sidebar">
     <div class="sidebar-inner">
+
       <!-- Sidebar header -->
       <div class="sidebar-hd">
-        <span class="sidebar-ttl">Clients</span>
-        <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Collapse panel">
+        <span class="sidebar-title">Clients</span>
+        <button class="sidebar-close" onclick="toggleSidebar()" title="Close panel">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
       </div>
 
-      <!-- New meeting button -->
+      <!-- Search -->
+      <div class="sidebar-search-wrap">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="sidebar-search" placeholder="Search clients…" autocomplete="off" oninput="filterClients(this.value)"/>
+        <button class="search-clear" id="search-clear" onclick="clearSearch()">×</button>
+      </div>
+
+      <!-- New meeting -->
       <button class="new-mtg-btn" onclick="newMeeting()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         New Meeting
       </button>
 
-      <!-- Client list -->
-      <div class="client-list-wrap">
-        <div class="sidebar-section-label">Saved Meetings</div>
+      <!-- Section label -->
+      <div class="sidebar-section-lbl">Saved Meetings</div>
+
+      <!-- Client list (scrollable) -->
+      <div class="client-list-scroll">
         <div id="client-list">
-          <!-- populated by JS -->
+          <!-- skeleton while loading -->
+          <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line long"></div><div class="skeleton-line short"></div></div></div>
+          <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line long"></div><div class="skeleton-line short"></div></div></div>
+          <div class="skeleton-item"><div class="skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton-line long"></div><div class="skeleton-line short"></div></div></div>
         </div>
+        <div id="sidebar-no-results" class="sidebar-no-results"></div>
       </div>
-    </div>
+
+    </div><!-- /sidebar-inner -->
   </aside>
 
-  <!-- ── MAIN AREA ── -->
-  <div class="main-area">
+  <!-- ── MAIN SCROLL AREA ── -->
+  <div class="main-scroll" id="main-scroll">
 
-    <!-- Top bar with active client indicator -->
-    <div class="main-topbar" id="main-topbar">
-      <button class="panel-toggle-btn" onclick="toggleSidebar()" id="panel-toggle-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+    <!-- Topbar -->
+    <div class="main-topbar">
+      <button class="topbar-toggle" onclick="toggleSidebar()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9 3v18"/></svg>
         Clients
       </button>
-      <div class="active-client-tag" id="active-client-tag" style="display:none;">
-        <div class="active-client-dot"></div>
+      <div class="active-client-pill" id="active-client-pill">
+        <div class="pill-dot"></div>
         <span id="active-client-name">—</span>
       </div>
     </div>
 
-    <!-- ═══════════════ CONTENT ═══════════════ -->
+    <!-- ════════════ FORM SECTIONS ════════════ -->
     <div class="content" id="agenda-content">
 
-      <!-- ── 1. Welcome & Team Introductions ── -->
+      <!-- 1. Welcome & Team Introductions -->
       <div class="card">
         <div class="card-header">
           <div class="section-num">1</div>
@@ -1020,7 +774,7 @@
         </div>
       </div>
 
-      <!-- ── 2. Project Access Setup ── -->
+      <!-- 2. Project Access Setup -->
       <div class="card">
         <div class="card-header">
           <div class="section-num">2</div>
@@ -1032,40 +786,20 @@
         <div class="card-body">
           <div class="tool-grid">
             <div class="tool-card">
-              <div class="tool-card-header">
-                <span class="tool-emoji">☁️</span>
-                <span class="tool-name">Cloud Platform</span>
-              </div>
-              <div class="tool-field">
-                <input id="access-cloud" type="text" placeholder="AWS / GCP / Azure / Oracle / Other" />
-              </div>
+              <div class="tool-card-header"><span class="tool-emoji">☁️</span><span class="tool-name">Cloud Platform</span></div>
+              <div class="tool-field"><input id="access-cloud" type="text" placeholder="AWS / GCP / Azure / Oracle / Other"/></div>
             </div>
             <div class="tool-card">
-              <div class="tool-card-header">
-                <span class="tool-emoji">🗂️</span>
-                <span class="tool-name">Source Control</span>
-              </div>
-              <div class="tool-field">
-                <input id="access-vcs" type="text" placeholder="GitHub / GitLab / Bitbucket / Other" />
-              </div>
+              <div class="tool-card-header"><span class="tool-emoji">🗂️</span><span class="tool-name">Source Control</span></div>
+              <div class="tool-field"><input id="access-vcs" type="text" placeholder="GitHub / GitLab / Bitbucket / Other"/></div>
             </div>
             <div class="tool-card">
-              <div class="tool-card-header">
-                <span class="tool-emoji">📋</span>
-                <span class="tool-name">Project Management</span>
-              </div>
-              <div class="tool-field">
-                <input id="access-pm" type="text" placeholder="Jira / Asana / Linear / ClickUp / Other" />
-              </div>
+              <div class="tool-card-header"><span class="tool-emoji">📋</span><span class="tool-name">Project Management</span></div>
+              <div class="tool-field"><input id="access-pm" type="text" placeholder="Jira / Asana / Linear / ClickUp / Other"/></div>
             </div>
             <div class="tool-card">
-              <div class="tool-card-header">
-                <span class="tool-emoji">💬</span>
-                <span class="tool-name">Communication</span>
-              </div>
-              <div class="tool-field">
-                <input id="access-comms" type="text" placeholder="Slack / Teams / Google Chat / Other" />
-              </div>
+              <div class="tool-card-header"><span class="tool-emoji">💬</span><span class="tool-name">Communication</span></div>
+              <div class="tool-field"><input id="access-comms" type="text" placeholder="Slack / Teams / Google Chat / Other"/></div>
             </div>
           </div>
           <div style="margin-top:12px;">
@@ -1073,14 +807,14 @@
               <div class="input-icon">➕</div>
               <div class="input-group">
                 <label>Additional Access / Tools Required</label>
-                <textarea id="access-additional" class="notes-area" placeholder="Any other tools, VPNs, environments, or credentials that need to be set up..." rows="2"></textarea>
+                <textarea id="access-additional" class="notes-area" rows="2" placeholder="Any other tools, VPNs, environments, or credentials…"></textarea>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── 3. Communication & Call Protocol ── -->
+      <!-- 3. Communication & Call Protocol -->
       <div class="card">
         <div class="card-header">
           <div class="section-num">3</div>
@@ -1098,8 +832,6 @@
                 <div class="item-desc">Agree on preferred days, times, and how often the team syncs each week.</div>
               </div>
             </div>
-
-            <!-- Call frequency chips -->
             <div class="input-item" style="align-items:flex-start;">
               <div class="input-icon" style="margin-top:2px;">🔁</div>
               <div class="input-group">
@@ -1112,9 +844,7 @@
                   <button type="button" class="freq-chip" data-value="Daily (5× per week)">Daily</button>
                   <button type="button" class="freq-chip" data-value="As needed / Ad hoc">Ad hoc</button>
                 </div>
-                <input type="hidden" id="call-frequency" />
-
-                <!-- Days selector -->
+                <input type="hidden" id="call-frequency"/>
                 <div class="freq-days-section" id="freq-days-section">
                   <div class="freq-days-hint" id="freq-days-hint">Select days</div>
                   <div class="freq-chips" id="day-chips">
@@ -1126,26 +856,23 @@
                     <button type="button" class="freq-chip" data-value="Sat">Sat</button>
                     <button type="button" class="freq-chip" data-value="Sun">Sun</button>
                   </div>
-                  <input type="hidden" id="call-days" />
+                  <input type="hidden" id="call-days"/>
                 </div>
               </div>
             </div>
-
-            <!-- Call Time & Time Zone -->
             <div class="input-item">
               <div class="input-icon">🕐</div>
-              <div class="input-group" style="display:flex; gap:20px;">
+              <div class="input-group" style="display:flex;gap:20px;">
                 <div style="flex:1;">
                   <label>Call Time</label>
-                  <input id="call-time" type="text" placeholder="e.g. 10:00 AM" />
+                  <input id="call-time" type="text" placeholder="e.g. 10:00 AM"/>
                 </div>
-                <div style="flex:1; border-left:1px solid var(--border); padding-left:20px;">
+                <div style="flex:1;border-left:1px solid var(--border);padding-left:20px;">
                   <label>Time Zone</label>
-                  <input id="call-timezone" type="text" placeholder="e.g. IST / EST / UTC+5:30" />
+                  <input id="call-timezone" type="text" placeholder="e.g. IST / EST / UTC+5:30"/>
                 </div>
               </div>
             </div>
-
             <div class="item">
               <div class="item-icon">📢</div>
               <div class="item-content">
@@ -1178,7 +905,7 @@
         </div>
       </div>
 
-      <!-- ── 4. Escalation Path ── -->
+      <!-- 4. Escalation Path -->
       <div class="card">
         <div class="card-header">
           <div class="section-num">4</div>
@@ -1188,35 +915,28 @@
           </div>
         </div>
         <div class="card-body">
-          <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px;">
-            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-light); margin-bottom:12px;">Heaptrace Escalation Path</div>
-            <div style="display:flex; align-items:center; gap:0;">
-              <div style="flex:1; background:#fff; border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
-                <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--ht-purple); margin-bottom:4px;">Level 1</div>
-                <div style="font-size:13px; font-weight:700; color:var(--text-main);">Delivery Manager</div>
-                <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">First point of escalation for any delivery, timeline, or team concerns</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-light);margin-bottom:12px;">Heaptrace Escalation Path</div>
+            <div style="display:flex;align-items:center;">
+              <div style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ht-purple);margin-bottom:4px;">Level 1</div>
+                <div style="font-size:13px;font-weight:700;color:var(--text-main);">Delivery Manager</div>
+                <div style="font-size:11px;color:var(--text-sub);margin-top:2px;">First point of escalation for delivery, timeline, or team concerns</div>
               </div>
-              <div style="padding:0 10px; flex-shrink:0;">
-                <svg width="28" height="16" viewBox="0 0 28 16" fill="none">
-                  <path d="M0 8H24M24 8L17 2M24 8L17 14" stroke="url(#esc-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <defs>
-                    <linearGradient id="esc-grad" x1="0" y1="8" x2="28" y2="8" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#F27121"/><stop offset="1" stop-color="#8A2387"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
+              <div style="padding:0 10px;flex-shrink:0;">
+                <svg width="28" height="16" viewBox="0 0 28 16" fill="none"><path d="M0 8H24M24 8L17 2M24 8L17 14" stroke="url(#eg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="eg" x1="0" y1="8" x2="28" y2="8" gradientUnits="userSpaceOnUse"><stop stop-color="#F27121"/><stop offset="1" stop-color="#8A2387"/></linearGradient></defs></svg>
               </div>
-              <div style="flex:1; background:#fff; border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; text-align:center;">
-                <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--ht-orange); margin-bottom:4px;">Level 2</div>
-                <div style="font-size:13px; font-weight:700; color:var(--text-main);">Director of Sales</div>
-                <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Senior escalation for commercial, strategic, or unresolved delivery issues</div>
+              <div style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ht-orange);margin-bottom:4px;">Level 2</div>
+                <div style="font-size:13px;font-weight:700;color:var(--text-main);">Director of Sales</div>
+                <div style="font-size:11px;color:var(--text-sub);margin-top:2px;">Senior escalation for commercial, strategic, or unresolved delivery issues</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── 5. First 2-Week Focus Areas ── -->
+      <!-- 5. First 2-Week Focus -->
       <div class="card">
         <div class="card-header">
           <div class="section-num">5</div>
@@ -1227,23 +947,14 @@
         </div>
         <div class="card-body">
           <div class="priority-list">
-            <div class="priority-item">
-              <div class="priority-num">P1</div>
-              <input id="priority-1" class="priority-input" type="text" placeholder="Top priority for the first two weeks" />
-            </div>
-            <div class="priority-item">
-              <div class="priority-num">P2</div>
-              <input id="priority-2" class="priority-input" type="text" placeholder="Second priority" />
-            </div>
-            <div class="priority-item">
-              <div class="priority-num">P3</div>
-              <input id="priority-3" class="priority-input" type="text" placeholder="Third priority" />
-            </div>
+            <div class="priority-item"><div class="priority-num">P1</div><input id="priority-1" class="priority-input" type="text" placeholder="Top priority for the first two weeks"/></div>
+            <div class="priority-item"><div class="priority-num">P2</div><input id="priority-2" class="priority-input" type="text" placeholder="Second priority"/></div>
+            <div class="priority-item"><div class="priority-num">P3</div><input id="priority-3" class="priority-input" type="text" placeholder="Third priority"/></div>
           </div>
         </div>
       </div>
 
-      <!-- ── 6. Open Discussion / AOB ── -->
+      <!-- 6. Open Discussion / AOB -->
       <div class="card">
         <div class="card-header">
           <div class="section-num">6</div>
@@ -1257,85 +968,112 @@
             <div class="input-icon">📝</div>
             <div class="input-group">
               <label>Meeting Notes &amp; Action Items</label>
-              <textarea id="notes-aob" class="notes-area" placeholder="Capture discussion points, decisions, and action items with owners and due dates...&#10;&#10;e.g.&#10;[Action] Heaptrace to share repo invite — Owner: DM — Due: DD Mon&#10;[Action] Client to confirm cloud access — Due: DD Mon&#10;[Decision] Call cadence confirmed: Mon &amp; Wed 10 AM"></textarea>
+              <textarea id="notes-aob" class="notes-area" placeholder="Capture discussion points, decisions, and action items…&#10;&#10;e.g.&#10;[Action] Heaptrace to share repo invite — Owner: DM — Due: DD Mon&#10;[Action] Client to confirm cloud access — Due: DD Mon&#10;[Decision] Call cadence confirmed: Mon &amp; Wed 10 AM"></textarea>
             </div>
           </div>
         </div>
       </div>
 
     </div><!-- /content -->
-  </div><!-- /main-area -->
-</div><!-- /app-layout -->
+  </div><!-- /main-scroll -->
 
-<!-- ═══════════════ FOOTER ═══════════════ -->
+</div><!-- /page-shell -->
+
+<!-- ── FOOTER ── -->
 <div class="grad-bar"></div>
 <div class="footer">
   <p class="footer-text">Prepared by <strong>Heaptrace Technology</strong> &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; <span id="footer-year"></span></p>
 </div>
 
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
 <script>
   document.getElementById('footer-year').textContent = new Date().getFullYear();
 
-  // ── Supabase ──────────────────────────────────────────────────────────────
+  /* ── Supabase ─────────────────────────────────────────────── */
   const SUPABASE_URL = 'https://ohlipdsngaziclitcrkd.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9obGlwZHNuZ2F6aWNsaXRjcmtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MTI2NjIsImV4cCI6MjA5NjQ4ODY2Mn0.chaxmkpe__LwpnG3vgKKD1T0jkDd-YM4H5TQX9npw74';
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Track current active client
+  /* ── State ────────────────────────────────────────────────── */
   let currentClient = null;
-  let sidebarOpen = true;
+  let sidebarOpen   = localStorage.getItem('ht_sidebar') !== '0'; // default open
 
-  // ── Sidebar toggle ────────────────────────────────────────────────────────
+  /* ── Sidebar toggle ───────────────────────────────────────── */
   function toggleSidebar() {
     sidebarOpen = !sidebarOpen;
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('collapsed', !sidebarOpen);
+    document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+    const tb = document.getElementById('sidebar-toggle-btn');
+    tb.classList.toggle('open', sidebarOpen);
+    localStorage.setItem('ht_sidebar', sidebarOpen ? '1' : '0');
   }
 
-  // ── New Meeting ───────────────────────────────────────────────────────────
+  /* Apply persisted sidebar state on load */
+  (function applyInitialSidebar() {
+    if (!sidebarOpen) {
+      document.getElementById('sidebar').classList.add('collapsed');
+      document.getElementById('sidebar-toggle-btn').classList.remove('open');
+    }
+  })();
+
+  /* ── New Meeting ──────────────────────────────────────────── */
   function newMeeting() {
-    // Clear all fields
     FIELDS.forEach(id => {
       const el = document.getElementById(id);
-      if (!el) return;
-      el.value = '';
+      if (el) el.value = '';
     });
-    // Reset chips
-    document.querySelectorAll('#freq-chips .freq-chip').forEach(c => c.classList.remove('active'));
-    document.querySelectorAll('#day-chips .freq-chip').forEach(c => c.classList.remove('active'));
-    document.getElementById('freq-days-section').classList.remove('visible');
-    // Reset meta-engagement select
     const eng = document.getElementById('meta-engagement');
     if (eng) eng.selectedIndex = 0;
-    // Clear active client
+    document.querySelectorAll('#freq-chips .freq-chip, #day-chips .freq-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('freq-days-section').classList.remove('visible');
     currentClient = null;
-    updateActiveClientTag(null);
-    setActiveClientItem(null);
+    setActivePill(null);
+    setActiveItem(null);
     showToast('New meeting started');
-    // Focus client name
-    const clientInput = document.getElementById('meta-client');
-    if (clientInput) clientInput.focus();
+    setTimeout(() => document.getElementById('meta-client').focus(), 100);
   }
 
-  // ── Active client tag in topbar ───────────────────────────────────────────
-  function updateActiveClientTag(name) {
-    const tag = document.getElementById('active-client-tag');
-    const nameEl = document.getElementById('active-client-name');
+  /* ── Active client UI ─────────────────────────────────────── */
+  function setActivePill(name) {
+    const pill = document.getElementById('active-client-pill');
     if (name) {
-      nameEl.textContent = name;
-      tag.style.display = 'inline-flex';
+      document.getElementById('active-client-name').textContent = name;
+      pill.classList.add('show');
     } else {
-      tag.style.display = 'none';
+      pill.classList.remove('show');
     }
   }
 
-  function setActiveClientItem(clientName) {
-    document.querySelectorAll('.client-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.client === clientName);
-    });
+  function setActiveItem(name) {
+    document.querySelectorAll('.client-item').forEach(el =>
+      el.classList.toggle('active', el.dataset.client === name)
+    );
   }
 
-  // ── Payload builder ───────────────────────────────────────────────────────
+  /* ── Search / filter ──────────────────────────────────────── */
+  function filterClients(q) {
+    const query = q.trim().toLowerCase();
+    let hits = 0;
+    document.querySelectorAll('.client-item').forEach(el => {
+      const match = !query || el.dataset.client.toLowerCase().includes(query);
+      el.style.display = match ? '' : 'none';
+      if (match) hits++;
+    });
+    const noRes = document.getElementById('sidebar-no-results');
+    noRes.style.display = (hits === 0 && query) ? '' : 'none';
+    noRes.textContent   = `No clients match "${q}"`;
+    document.getElementById('search-clear').style.display = q ? '' : 'none';
+  }
+
+  function clearSearch() {
+    const inp = document.getElementById('sidebar-search');
+    inp.value = '';
+    filterClients('');
+    inp.focus();
+  }
+
+  /* ── Payload ──────────────────────────────────────────────── */
   function getPayload() {
     return {
       client_name:       document.getElementById('meta-client').value.trim(),
@@ -1358,218 +1096,157 @@
     };
   }
 
-  // ── Save to Supabase ──────────────────────────────────────────────────────
+  /* ── Save to Supabase ─────────────────────────────────────── */
   async function saveToDatabase() {
     const payload = getPayload();
     if (!payload.client_name) {
       showToast('Enter a client name first');
-      document.getElementById('meta-client').focus();
+      const inp = document.getElementById('meta-client');
+      inp.focus();
+      inp.closest('.meta-field').style.borderColor = 'rgba(242,113,33,.6)';
+      setTimeout(() => inp.closest('.meta-field').style.borderColor = '', 2000);
       return;
     }
-
     const btn = document.getElementById('save-db-btn');
     btn.disabled = true;
-    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+    btn.innerHTML = spinnerSVG();
 
-    const { error } = await db
-      .from('kickoff_meetings')
-      .upsert(payload, { onConflict: 'client_name' });
+    const { error } = await db.from('kickoff_meetings').upsert(payload, { onConflict: 'client_name' });
 
     btn.disabled = false;
-    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>`;
+    btn.innerHTML = uploadSVG();
 
     if (error) {
       showToast('Save failed — ' + error.message);
-      console.error('Supabase save error:', error);
+      console.error(error);
     } else {
       currentClient = payload.client_name;
       showToast('Saved ✓  ' + payload.client_name);
       saveAgenda();
-      updateActiveClientTag(payload.client_name);
+      setActivePill(payload.client_name);
       await refreshClientList(payload.client_name);
     }
   }
 
-  // ── Refresh sidebar client list ───────────────────────────────────────────
+  /* ── Refresh sidebar list ─────────────────────────────────── */
   async function refreshClientList(keepActive) {
-    const { data } = await db
+    const { data, error } = await db
       .from('kickoff_meetings')
       .select('client_name, updated_at')
       .order('updated_at', { ascending: false });
 
     const list = document.getElementById('client-list');
-    list.innerHTML = '';
 
-    if (!data || data.length === 0) {
+    if (error || !data || data.length === 0) {
       list.innerHTML = `
         <div class="sidebar-empty">
           <div class="sidebar-empty-icon">📋</div>
-          <div class="sidebar-empty-text">No saved meetings yet.<br>Fill in the form and click<br>Save (☁) to get started.</div>
+          <div class="sidebar-empty-text">No saved meetings yet.<br>Fill the form and click ☁<br>to save your first record.</div>
         </div>`;
       return;
     }
 
+    list.innerHTML = '';
+    const active = keepActive || currentClient;
     data.forEach(row => {
-      const item = document.createElement('div');
-      item.className = 'client-item';
-      item.dataset.client = row.client_name;
-      if (row.client_name === (keepActive || currentClient)) {
-        item.classList.add('active');
-      }
-      const initial = row.client_name.charAt(0).toUpperCase();
-      const dateStr  = relativeDate(row.updated_at);
-      item.innerHTML = `
-        <div class="client-avatar">${initial}</div>
-        <div class="client-item-info">
-          <div class="client-item-name">${escHtml(row.client_name)}</div>
-          <div class="client-item-date">${dateStr}</div>
+      const div = document.createElement('div');
+      div.className = 'client-item' + (row.client_name === active ? ' active' : '');
+      div.dataset.client = row.client_name;
+      div.innerHTML = `
+        <div class="client-avatar">${escHtml(row.client_name.charAt(0).toUpperCase())}</div>
+        <div class="client-info">
+          <div class="client-name">${escHtml(row.client_name)}</div>
+          <div class="client-date">${relDate(row.updated_at)}</div>
         </div>`;
-      item.addEventListener('click', () => loadClientData(row.client_name));
-      list.appendChild(item);
+      div.addEventListener('click', () => loadClientData(row.client_name));
+      list.appendChild(div);
     });
+
+    // Re-apply any active search filter
+    const q = document.getElementById('sidebar-search').value;
+    if (q) filterClients(q);
   }
 
-  // Keep old name as alias for DOMContentLoaded call
-  function refreshClientPicker(keepSelected) {
-    return refreshClientList(keepSelected);
-  }
-
-  // ── Load client data from Supabase ────────────────────────────────────────
-  async function loadClientData(clientName) {
-    if (!clientName) return;
-
+  /* ── Load client from Supabase ────────────────────────────── */
+  async function loadClientData(name) {
+    if (!name) return;
     const { data, error } = await db
-      .from('kickoff_meetings')
-      .select('*')
-      .eq('client_name', clientName)
-      .single();
+      .from('kickoff_meetings').select('*').eq('client_name', name).single();
 
-    if (error || !data) { showToast('Could not load client data'); return; }
+    if (error || !data) { showToast('Could not load client'); return; }
 
     const map = {
-      'meta-client':       data.client_name,
-      'meta-date':         data.meeting_date    || '',
-      'meta-engagement':   data.engagement_type || '',
-      'access-cloud':      data.access_cloud    || '',
-      'access-vcs':        data.access_vcs      || '',
-      'access-pm':         data.access_pm       || '',
-      'access-comms':      data.access_comms    || '',
+      'meta-client': data.client_name, 'meta-date': data.meeting_date || '',
+      'meta-engagement': data.engagement_type || '',
+      'access-cloud': data.access_cloud || '', 'access-vcs': data.access_vcs || '',
+      'access-pm': data.access_pm || '', 'access-comms': data.access_comms || '',
       'access-additional': data.access_additional || '',
-      'call-frequency':    data.call_frequency  || '',
-      'call-days':         data.call_days       || '',
-      'call-time':         data.call_time       || '',
-      'call-timezone':     data.call_timezone   || '',
-      'priority-1':        data.priority_1      || '',
-      'priority-2':        data.priority_2      || '',
-      'priority-3':        data.priority_3      || '',
-      'notes-aob':         data.notes_aob       || ''
+      'call-frequency': data.call_frequency || '', 'call-days': data.call_days || '',
+      'call-time': data.call_time || '', 'call-timezone': data.call_timezone || '',
+      'priority-1': data.priority_1 || '', 'priority-2': data.priority_2 || '',
+      'priority-3': data.priority_3 || '', 'notes-aob': data.notes_aob || ''
     };
-
     Object.entries(map).forEach(([id, val]) => {
       const el = document.getElementById(id);
       if (el) el.value = val;
     });
-
     restoreFreqChips();
-    currentClient = clientName;
-    updateActiveClientTag(clientName);
-    setActiveClientItem(clientName);
-    showToast('Loaded: ' + clientName);
-    // Scroll to top of form
-    document.getElementById('agenda-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    currentClient = name;
+    setActivePill(name);
+    setActiveItem(name);
+    showToast('Loaded: ' + name);
+    document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
-  function relativeDate(iso) {
-    if (!iso) return '';
-    const d    = new Date(iso);
-    const diff = Date.now() - d.getTime();
-    const days = Math.floor(diff / 86400000);
-    if (days === 0) return 'Today';
-    if (days === 1) return 'Yesterday';
-    if (days < 7)  return days + 'd ago';
-    if (days < 30) return Math.floor(days / 7) + 'w ago';
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
-
-  function escHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ── localStorage ──────────────────────────────────────────────────────────
+  /* ── localStorage ─────────────────────────────────────────── */
   const STORAGE_KEY = 'heaptrace_kickoff_agenda_v1';
-
   const FIELDS = [
-    'meta-client', 'meta-date', 'meta-engagement',
-    'access-cloud', 'access-vcs', 'access-pm', 'access-comms', 'access-additional',
-    'call-frequency', 'call-days', 'call-time', 'call-timezone',
-    'priority-1', 'priority-2', 'priority-3',
-    'notes-aob'
+    'meta-client','meta-date','meta-engagement',
+    'access-cloud','access-vcs','access-pm','access-comms','access-additional',
+    'call-frequency','call-days','call-time','call-timezone',
+    'priority-1','priority-2','priority-3','notes-aob'
   ];
 
   function saveAgenda() {
-    const data = {};
-    FIELDS.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) data[id] = el.value;
-    });
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+    const d = {};
+    FIELDS.forEach(id => { const el = document.getElementById(id); if (el) d[id] = el.value; });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch(e) {}
   }
 
   function loadAgenda() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
-      const data = JSON.parse(raw);
-      FIELDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && data[id] !== undefined) el.value = data[id];
-      });
+      const d = JSON.parse(raw);
+      FIELDS.forEach(id => { const el = document.getElementById(id); if (el && d[id] !== undefined) el.value = d[id]; });
       restoreFreqChips();
-      const savedClient = data['meta-client'];
-      if (savedClient) updateActiveClientTag(savedClient);
-    } catch (e) {}
+      if (d['meta-client']) { currentClient = d['meta-client']; setActivePill(d['meta-client']); }
+    } catch(e) {}
   }
 
-  // ── Frequency chip helpers ────────────────────────────────────────────────
+  /* ── Freq chip helpers ────────────────────────────────────── */
   function freqLimit(val) {
     if (!val) return 0;
     const n = parseInt(val);
-    if (!isNaN(n)) return n;
-    if (val.startsWith('Daily')) return 5;
-    return 0;
+    return !isNaN(n) ? n : val.startsWith('Daily') ? 5 : 0;
   }
-
-  function updateDaysHint(freqVal) {
-    const lim  = freqLimit(freqVal);
-    const hint = document.getElementById('freq-days-hint');
-    if (freqVal === 'As needed / Ad hoc') {
-      hint.textContent = 'Preferred days (optional)';
-    } else if (lim === 1) {
-      hint.textContent = 'Select 1 day';
-    } else if (lim > 0) {
-      hint.textContent = `Select up to ${lim} days`;
-    } else {
-      hint.textContent = 'Select days';
-    }
+  function updateDaysHint(val) {
+    const lim = freqLimit(val);
+    const h = document.getElementById('freq-days-hint');
+    h.textContent = val === 'As needed / Ad hoc' ? 'Preferred days (optional)'
+      : lim === 1 ? 'Select 1 day' : lim > 0 ? `Select up to ${lim} days` : 'Select days';
   }
-
-  function clearDayChips() {
-    document.querySelectorAll('#day-chips .freq-chip').forEach(c => c.classList.remove('active'));
-    document.getElementById('call-days').value = '';
-  }
-
   function syncDaysValue() {
-    const selected = [...document.querySelectorAll('#day-chips .freq-chip.active')].map(c => c.dataset.value);
-    document.getElementById('call-days').value = selected.join(', ');
+    document.getElementById('call-days').value =
+      [...document.querySelectorAll('#day-chips .freq-chip.active')].map(c => c.dataset.value).join(', ');
   }
-
   function selectFreq(chip) {
     document.querySelectorAll('#freq-chips .freq-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     const val = chip.dataset.value;
     document.getElementById('call-frequency').value = val;
-    clearDayChips();
+    document.querySelectorAll('#day-chips .freq-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('call-days').value = '';
     updateDaysHint(val);
     if (val === 'Daily (5× per week)') {
       document.querySelectorAll('#day-chips .freq-chip').forEach(c => {
@@ -1579,139 +1256,109 @@
     }
     document.getElementById('freq-days-section').classList.add('visible');
   }
-
   function selectDay(chip) {
-    const freqVal   = document.getElementById('call-frequency').value;
-    const lim       = freqLimit(freqVal);
-    const activeDays = document.querySelectorAll('#day-chips .freq-chip.active');
+    const lim = freqLimit(document.getElementById('call-frequency').value);
+    const active = document.querySelectorAll('#day-chips .freq-chip.active');
     if (chip.classList.contains('active')) {
       chip.classList.remove('active');
     } else {
-      if (lim > 0 && activeDays.length >= lim) activeDays[0].classList.remove('active');
+      if (lim > 0 && active.length >= lim) active[0].classList.remove('active');
       chip.classList.add('active');
     }
     syncDaysValue();
   }
-
   function restoreFreqChips() {
-    const freqVal = document.getElementById('call-frequency').value;
-    if (freqVal) {
-      document.querySelectorAll('#freq-chips .freq-chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.value === freqVal);
-      });
-      updateDaysHint(freqVal);
+    const fv = document.getElementById('call-frequency').value;
+    if (fv) {
+      document.querySelectorAll('#freq-chips .freq-chip').forEach(c =>
+        c.classList.toggle('active', c.dataset.value === fv));
+      updateDaysHint(fv);
     }
-    const daysVal = document.getElementById('call-days').value;
-    if (daysVal) {
-      const saved = daysVal.split(', ').map(s => s.trim());
-      document.querySelectorAll('#day-chips .freq-chip').forEach(c => {
-        c.classList.toggle('active', saved.includes(c.dataset.value));
-      });
+    const dv = document.getElementById('call-days').value;
+    if (dv) {
+      const saved = dv.split(', ').map(s => s.trim());
+      document.querySelectorAll('#day-chips .freq-chip').forEach(c =>
+        c.classList.toggle('active', saved.includes(c.dataset.value)));
       document.getElementById('freq-days-section').classList.add('visible');
     }
   }
+  document.querySelectorAll('#freq-chips .freq-chip').forEach(c => c.addEventListener('click', () => selectFreq(c)));
+  document.querySelectorAll('#day-chips  .freq-chip').forEach(c => c.addEventListener('click', () => selectDay(c)));
 
-  document.querySelectorAll('#freq-chips .freq-chip').forEach(chip => {
-    chip.addEventListener('click', () => selectFreq(chip));
-  });
-  document.querySelectorAll('#day-chips .freq-chip').forEach(chip => {
-    chip.addEventListener('click', () => selectDay(chip));
-  });
-
-  // ── Toast ─────────────────────────────────────────────────────────────────
+  /* ── Toast ────────────────────────────────────────────────── */
   function showToast(msg) {
-    const toast = document.getElementById('toast');
+    const t = document.getElementById('toast');
     document.getElementById('toast-msg').textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2400);
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2600);
   }
 
-  // ── PDF Download ──────────────────────────────────────────────────────────
+  /* ── PDF Download ─────────────────────────────────────────── */
   async function downloadPDF() {
     const btn = document.getElementById('download-btn');
-    const originalHTML = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+    const orig = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = spinnerSVG();
 
     const replacements = [];
     FIELDS.forEach(id => {
       const el = document.getElementById(id);
       if (!el || el.type === 'hidden') return;
-
-      let displayValue = '';
-      if (el.tagName === 'SELECT') {
-        displayValue = el.selectedIndex > 0 ? el.options[el.selectedIndex].text : '';
-      } else {
-        displayValue = el.value;
-      }
-
-      const isTextarea = el.tagName === 'TEXTAREA';
-      const proxy = document.createElement(isTextarea ? 'div' : 'span');
+      const val = el.tagName === 'SELECT' ? (el.selectedIndex > 0 ? el.options[el.selectedIndex].text : '') : el.value;
+      const proxy = document.createElement(el.tagName === 'TEXTAREA' ? 'div' : 'span');
       proxy.className = '__pdf-proxy';
-      proxy.textContent = displayValue;
-
       const cs = window.getComputedStyle(el);
-      proxy.style.cssText = [
-        `font-family:${cs.fontFamily}`,
-        `font-size:${cs.fontSize}`,
-        `font-weight:${cs.fontWeight}`,
-        `line-height:${cs.lineHeight}`,
-        `width:100%`,
-        `display:block`,
-        `white-space:pre-wrap`,
-        `word-break:break-word`,
-        `color:${displayValue ? cs.color : 'rgba(0,0,0,0.3)'}`,
-        `background:transparent`,
-        `padding-bottom:${cs.paddingBottom}`
-      ].join(';');
-
-      if (!displayValue && el.placeholder) {
-        proxy.textContent = el.placeholder;
-        proxy.style.color = 'rgba(0,0,0,0.3)';
-      }
-
+      proxy.style.cssText = `font-family:${cs.fontFamily};font-size:${cs.fontSize};font-weight:${cs.fontWeight};line-height:${cs.lineHeight};width:100%;display:block;white-space:pre-wrap;word-break:break-word;color:${val ? cs.color : 'rgba(0,0,0,.3)'};background:transparent`;
+      proxy.textContent = val || el.placeholder || '';
       el.parentNode.insertBefore(proxy, el);
       el.style.display = 'none';
       replacements.push({ el, proxy });
     });
-
-    // Hide non-printable UI
-    const hideEls = [
-      document.querySelector('.btn-row'),
-      document.querySelector('.sidebar'),
-      document.querySelector('.main-topbar')
-    ];
-    hideEls.forEach(el => { if (el) el.style.visibility = 'hidden'; });
+    const hideEls = [document.querySelector('.sidebar'), document.querySelector('.main-topbar'), document.querySelector('.btn-row')];
+    hideEls.forEach(el => { if (el) el.style.display = 'none'; });
 
     try {
-      const clientName = document.getElementById('meta-client').value.trim();
-      const filename = clientName
-        ? `Heaptrace-Kickoff-Agenda-${clientName.replace(/\s+/g, '-')}.pdf`
-        : 'Heaptrace-Kickoff-Agenda.pdf';
-
+      const name = document.getElementById('meta-client').value.trim();
       await html2pdf().set({
-        margin: 0,
-        filename,
-        image: { type: 'jpeg', quality: 0.97 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, windowWidth: 1100 },
+        margin: 0, filename: name ? `Heaptrace-Kickoff-${name.replace(/\s+/g,'-')}.pdf` : 'Heaptrace-Kickoff.pdf',
+        image: { type: 'jpeg', quality: .97 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, windowWidth: 900 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        pagebreak: { mode: ['avoid-all','css','legacy'] }
       }).from(document.getElementById('agenda-content')).save();
-
-    } catch (err) {
-      showToast('PDF generation failed — try again');
-    } finally {
+    } catch(e) { showToast('PDF generation failed'); }
+    finally {
       replacements.forEach(({ el, proxy }) => { proxy.remove(); el.style.display = ''; });
-      hideEls.forEach(el => { if (el) el.style.visibility = ''; });
-      btn.disabled = false;
-      btn.innerHTML = originalHTML;
+      hideEls.forEach(el => { if (el) el.style.display = ''; });
+      btn.disabled = false; btn.innerHTML = orig;
     }
   }
 
-  // Auto-save localStorage every 60s
+  /* ── SVG helpers ──────────────────────────────────────────── */
+  function spinnerSVG() {
+    return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+  }
+  function uploadSVG() {
+    return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>`;
+  }
+
+  /* ── Utility ──────────────────────────────────────────────── */
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function relDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso), diff = Date.now() - d.getTime(), days = Math.floor(diff / 86400000);
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7)  return days + 'd ago';
+    if (days < 30) return Math.floor(days/7) + 'w ago';
+    return d.toLocaleDateString('en-US',{ month:'short', day:'numeric' });
+  }
+
+  /* ── Auto-save localStorage every 60s ────────────────────── */
   setInterval(saveAgenda, 60000);
 
-  // Init
+  /* ── Init ─────────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', () => {
     loadAgenda();
     refreshClientList();
