@@ -418,6 +418,34 @@
       box-shadow: 0 2px 10px rgba(180,48,114,0.28);
     }
 
+    /* ── DAYS SECTION ── */
+    .freq-days-section {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 1px dashed transparent;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.32s ease, opacity 0.25s ease,
+                  margin-top 0.28s ease, padding-top 0.28s ease,
+                  border-color 0.28s ease;
+    }
+    .freq-days-section.visible {
+      max-height: 100px;
+      opacity: 1;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-color: var(--border);
+    }
+    .freq-days-hint {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-light);
+      margin-bottom: 7px;
+    }
+
     /* ── NOTES AREA ── */
     .notes-area {
       width: 100%;
@@ -756,6 +784,21 @@
               <button type="button" class="freq-chip" data-value="As needed / Ad hoc">Ad hoc</button>
             </div>
             <input type="hidden" id="call-frequency" />
+
+            <!-- Days selector — appears after frequency is picked -->
+            <div class="freq-days-section" id="freq-days-section">
+              <div class="freq-days-hint" id="freq-days-hint">Select days</div>
+              <div class="freq-chips" id="day-chips">
+                <button type="button" class="freq-chip" data-value="Mon">Mon</button>
+                <button type="button" class="freq-chip" data-value="Tue">Tue</button>
+                <button type="button" class="freq-chip" data-value="Wed">Wed</button>
+                <button type="button" class="freq-chip" data-value="Thu">Thu</button>
+                <button type="button" class="freq-chip" data-value="Fri">Fri</button>
+                <button type="button" class="freq-chip" data-value="Sat">Sat</button>
+                <button type="button" class="freq-chip" data-value="Sun">Sun</button>
+              </div>
+              <input type="hidden" id="call-days" />
+            </div>
           </div>
         </div>
 
@@ -907,7 +950,7 @@
   const FIELDS = [
     'meta-client', 'meta-date', 'meta-engagement',
     'access-cloud', 'access-vcs', 'access-pm', 'access-comms', 'access-additional',
-    'call-frequency', 'call-time', 'call-timezone',
+    'call-frequency', 'call-days', 'call-time', 'call-timezone',
     'priority-1', 'priority-2', 'priority-3',
     'notes-aob'
   ];
@@ -941,23 +984,104 @@
     }
   }
 
+  // ── Frequency helpers ──────────────────────────────────
+  function freqLimit(val) {
+    if (!val) return 0;
+    const n = parseInt(val);          // parses "2×…" → 2, "Daily…" → NaN
+    if (!isNaN(n)) return n;
+    if (val.startsWith('Daily')) return 5;
+    return 0;                         // Ad hoc = no enforced limit
+  }
+
+  function updateDaysHint(freqVal) {
+    const lim = freqLimit(freqVal);
+    const hint = document.getElementById('freq-days-hint');
+    if (freqVal === 'As needed / Ad hoc') {
+      hint.textContent = 'Preferred days (optional)';
+    } else if (lim === 1) {
+      hint.textContent = 'Select 1 day';
+    } else if (lim > 0) {
+      hint.textContent = `Select up to ${lim} days`;
+    } else {
+      hint.textContent = 'Select days';
+    }
+  }
+
+  function clearDayChips() {
+    document.querySelectorAll('#day-chips .freq-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('call-days').value = '';
+  }
+
+  function syncDaysValue() {
+    const selected = [...document.querySelectorAll('#day-chips .freq-chip.active')]
+      .map(c => c.dataset.value);
+    document.getElementById('call-days').value = selected.join(', ');
+  }
+
   function selectFreq(chip) {
     document.querySelectorAll('#freq-chips .freq-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
-    document.getElementById('call-frequency').value = chip.dataset.value;
+    const val = chip.dataset.value;
+    document.getElementById('call-frequency').value = val;
+
+    // Clear previous day picks
+    clearDayChips();
+    updateDaysHint(val);
+
+    // Auto-select Mon–Fri for Daily
+    if (val === 'Daily (5× per week)') {
+      document.querySelectorAll('#day-chips .freq-chip').forEach(c => {
+        if (['Mon','Tue','Wed','Thu','Fri'].includes(c.dataset.value)) c.classList.add('active');
+      });
+      syncDaysValue();
+    }
+
+    // Show days section for all except Ad hoc hides no days, still show
+    document.getElementById('freq-days-section').classList.add('visible');
+  }
+
+  function selectDay(chip) {
+    const freqVal = document.getElementById('call-frequency').value;
+    const lim = freqLimit(freqVal);
+    const activeDays = document.querySelectorAll('#day-chips .freq-chip.active');
+
+    if (chip.classList.contains('active')) {
+      chip.classList.remove('active');
+    } else {
+      if (lim > 0 && activeDays.length >= lim) {
+        // Bump the earliest selected off to make room
+        activeDays[0].classList.remove('active');
+      }
+      chip.classList.add('active');
+    }
+    syncDaysValue();
   }
 
   function restoreFreqChips() {
-    const val = document.getElementById('call-frequency').value;
-    if (!val) return;
-    document.querySelectorAll('#freq-chips .freq-chip').forEach(chip => {
-      if (chip.dataset.value === val) chip.classList.add('active');
-    });
+    const freqVal = document.getElementById('call-frequency').value;
+    if (freqVal) {
+      document.querySelectorAll('#freq-chips .freq-chip').forEach(c => {
+        if (c.dataset.value === freqVal) c.classList.add('active');
+      });
+      updateDaysHint(freqVal);
+    }
+
+    const daysVal = document.getElementById('call-days').value;
+    if (daysVal) {
+      const saved = daysVal.split(', ').map(s => s.trim());
+      document.querySelectorAll('#day-chips .freq-chip').forEach(c => {
+        if (saved.includes(c.dataset.value)) c.classList.add('active');
+      });
+      document.getElementById('freq-days-section').classList.add('visible');
+    }
   }
 
   // Attach chip click handlers
   document.querySelectorAll('#freq-chips .freq-chip').forEach(chip => {
     chip.addEventListener('click', () => selectFreq(chip));
+  });
+  document.querySelectorAll('#day-chips .freq-chip').forEach(chip => {
+    chip.addEventListener('click', () => selectDay(chip));
   });
 
   function showToast(msg) {
