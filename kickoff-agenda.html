@@ -742,6 +742,21 @@
           </div>
         </div>
 
+        <!-- Call Time & Time Zone -->
+        <div class="input-item">
+          <div class="input-icon">🕐</div>
+          <div class="input-group" style="display:flex; gap:20px;">
+            <div style="flex:1;">
+              <label>Call Time</label>
+              <input id="call-time" type="text" placeholder="e.g. 10:00 AM" />
+            </div>
+            <div style="flex:1; border-left:1px solid var(--border); padding-left:20px;">
+              <label>Time Zone</label>
+              <input id="call-timezone" type="text" placeholder="e.g. IST / EST / UTC+5:30" />
+            </div>
+          </div>
+        </div>
+
         <div class="item">
           <div class="item-icon">🌐</div>
           <div class="item-content">
@@ -754,6 +769,13 @@
           <div class="item-content">
             <div class="item-label">Async Communication</div>
             <div class="item-desc">Confirm the primary channel for day-to-day updates, questions, and quick decisions outside of scheduled calls.</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">📢</div>
+          <div class="item-content">
+            <div class="item-label">Daily Work Updates</div>
+            <div class="item-desc">Work updates will be shared on the Communication channel on a daily basis to keep all stakeholders informed of progress.</div>
           </div>
         </div>
         <div class="item">
@@ -882,7 +904,7 @@
   const FIELDS = [
     'meta-client', 'meta-date', 'meta-engagement',
     'access-cloud', 'access-vcs', 'access-pm', 'access-comms', 'access-additional',
-    'call-frequency',
+    'call-frequency', 'call-time', 'call-timezone',
     'priority-1', 'priority-2', 'priority-3',
     'notes-aob'
   ];
