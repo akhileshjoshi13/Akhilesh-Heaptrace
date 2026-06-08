@@ -384,6 +384,23 @@
     .tool-field input::placeholder { color: var(--text-light); font-weight: 400; }
     .tool-field input:focus { border-bottom-color: var(--ht-purple); }
 
+    /* ── FREQ SELECT ── */
+    .freq-select {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-main);
+      background: transparent;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .freq-select option { background: #fff; color: var(--text-main); }
+    .freq-select option:disabled { color: var(--text-light); }
+
     /* ── NOTES AREA ── */
     .notes-area {
       width: 100%;
@@ -704,9 +721,27 @@
           <div class="item-icon">📞</div>
           <div class="item-content">
             <div class="item-label">Call Cadence</div>
-            <div class="item-desc">Propose 2–3 syncs per week — agree on preferred days and times during this call.</div>
+            <div class="item-desc">Agree on preferred days, times, and how often the team syncs each week.</div>
           </div>
         </div>
+
+        <!-- Call frequency dropdown -->
+        <div class="input-item">
+          <div class="input-icon">🔁</div>
+          <div class="input-group">
+            <label>Call Frequency per Week</label>
+            <select id="call-frequency" class="freq-select">
+              <option value="" disabled selected>Select frequency</option>
+              <option>1× per week</option>
+              <option>2× per week</option>
+              <option>3× per week</option>
+              <option>4× per week</option>
+              <option>Daily (5× per week)</option>
+              <option>As needed / Ad hoc</option>
+            </select>
+          </div>
+        </div>
+
         <div class="item">
           <div class="item-icon">🌐</div>
           <div class="item-content">
@@ -847,6 +882,7 @@
   const FIELDS = [
     'meta-client', 'meta-date', 'meta-engagement',
     'access-cloud', 'access-vcs', 'access-pm', 'access-comms', 'access-additional',
+    'call-frequency',
     'priority-1', 'priority-2', 'priority-3',
     'notes-aob'
   ];
