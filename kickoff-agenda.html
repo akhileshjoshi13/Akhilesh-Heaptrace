@@ -1247,15 +1247,7 @@
     const saved = await saveToDatabase();
     if (saved === false) { setModalBusy(false); return; } // validation failed inside saveToDatabase
 
-    // 2. Generate PDF as base64
-    let pdfBase64 = null;
-    try {
-      pdfBase64 = await generatePDFBase64();
-    } catch(e) {
-      console.warn('PDF generation failed, sending email without attachment:', e);
-    }
-
-    // 3. POST to n8n
+    // 2. POST to n8n (HTML summary built server-side in n8n Code node)
     if (!N8N_WEBHOOK_URL || N8N_WEBHOOK_URL === 'YOUR_N8N_WEBHOOK_URL') {
       showToast('⚠️ Set N8N_WEBHOOK_URL in the code first');
       setModalBusy(false);
@@ -1270,9 +1262,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...payload,
-          client_email: email,
-          pdf_base64: pdfBase64,
-          pdf_filename: `Heaptrace-Kickoff-${(payload.client_name || 'Meeting').replace(/\s+/g,'-')}.pdf`
+          client_email: email
         })
       });
       if (res.ok) {

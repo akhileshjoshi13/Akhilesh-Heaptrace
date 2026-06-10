@@ -715,9 +715,8 @@ test.describe('Kickoff Agenda — n8n webhook payload', () => {
     expect(capturedBody.priority_1).toBe('Deploy staging env')
     expect(capturedBody.priority_2).toBe('Onboard team')
     expect(capturedBody.notes_aob).toBe('Send repo invite by Friday')
-    expect(typeof capturedBody.pdf_base64).toBe('string')
-    expect((capturedBody.pdf_base64 as string).length).toBeGreaterThan(100)
-    expect(capturedBody.pdf_filename).toContain('Webhook-Corp')
+    expect(capturedBody.pdf_base64).toBeUndefined()
+    expect(capturedBody.pdf_filename).toBeUndefined()
   })
 
   test('save & send posts to the correct n8n cloud URL', async ({ page }) => {
