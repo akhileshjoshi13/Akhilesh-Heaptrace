@@ -39,10 +39,9 @@
       font-family: 'Inter', sans-serif;
       color: var(--text-main);
       background: var(--surface);
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
 
     /* ══════════════════════════════════════════
@@ -146,9 +145,8 @@
     ══════════════════════════════════════════ */
     .page-shell {
       flex: 1;
-      min-height: 0;       /* crucial: lets flex children shrink below content size */
       display: flex;
-      overflow: hidden;
+      align-items: flex-start;
     }
 
     /* ══════════════════════════════════════════
@@ -163,7 +161,9 @@
       flex-direction: column;
       overflow: hidden;
       transition: width .3s cubic-bezier(.4,0,.2,1);
-      position: relative;
+      position: sticky;
+      top: 0;
+      height: 100vh;
       z-index: 10;
     }
     .sidebar.collapsed { width: 0; }
@@ -339,7 +339,6 @@
     .main-scroll {
       flex: 1;
       min-width: 0;
-      overflow-y: auto;
       overflow-x: hidden;
       background: var(--surface);
     }
@@ -571,10 +570,9 @@
 
     /* ── PRINT / PDF ── */
     @media print {
-      body { height: auto; overflow: visible; display: block; background: #fff; }
+      body { background: #fff; }
       .sidebar, .main-topbar, .btn-row, .footer { display: none !important; }
       .page-shell { display: block; }
-      .main-scroll { overflow: visible; }
       .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
       .header::before { display: none; }
       input, textarea, .meta-select { color: #000 !important; }
@@ -650,15 +648,12 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-      body { overflow: auto; height: auto; }
-      .page-shell { overflow: visible; flex-direction: column; }
       .sidebar {
         position: fixed; left: 0; top: 0; height: 100vh;
         z-index: 200; transform: translateX(0);
         transition: transform .3s cubic-bezier(.4,0,.2,1), width .3s;
       }
       .sidebar.collapsed { transform: translateX(-100%); width: var(--sidebar-w); }
-      .main-scroll { overflow: visible; }
       .header-inner { padding: 20px 16px 16px; }
       .content { padding: 0 16px 40px; }
       .tool-grid { grid-template-columns: 1fr; }
