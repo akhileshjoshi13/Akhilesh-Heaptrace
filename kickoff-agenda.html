@@ -1295,7 +1295,9 @@
     const payload = getPayload();
     const email = payload.client_email;
 
-    if (email && N8N_WEBHOOK_URL && N8N_WEBHOOK_URL !== 'YOUR_N8N_WEBHOOK_URL') {
+    if (!email) {
+      showToast('Saved ✓ — add client email to also send agenda');
+    } else if (N8N_WEBHOOK_URL && N8N_WEBHOOK_URL !== 'YOUR_N8N_WEBHOOK_URL') {
       try {
         const res = await fetch(N8N_WEBHOOK_URL, {
           method: 'POST',
