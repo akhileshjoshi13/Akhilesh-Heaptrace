@@ -718,7 +718,7 @@
         </button>
 
         <!-- Save to Supabase -->
-        <button class="hdr-btn" id="save-db-btn" onclick="saveAndSend()" title="Save & Send to Client">
+        <button class="hdr-btn" id="save-db-btn" onclick="openSendModal()" title="Save / Send to Client">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
         </button>
 
@@ -736,10 +736,6 @@
       <div class="meta-field">
         <label>Client</label>
         <input id="meta-client" type="text" placeholder="Client / Company name" autocomplete="off"/>
-      </div>
-      <div class="meta-field">
-        <label>Email</label>
-        <input id="meta-email" type="email" placeholder="client@company.com" autocomplete="off"/>
       </div>
       <div class="meta-field">
         <label>Date</label>
@@ -1170,7 +1166,6 @@
   function getPayload() {
     return {
       client_name:       document.getElementById('meta-client').value.trim(),
-      client_email:      document.getElementById('meta-email').value.trim(),
       meeting_date:      document.getElementById('meta-date').value || null,
       engagement_type:   document.getElementById('meta-engagement').value || null,
       access_cloud:      document.getElementById('access-cloud').value,
@@ -1279,46 +1274,6 @@
     closeSendModal();
   }
 
-  /* ── Save + auto-send via n8n (no modal) ─────────────────── */
-  async function saveAndSend() {
-    const btn = document.getElementById('save-db-btn');
-    btn.disabled = true;
-    btn.innerHTML = spinnerSVG();
-
-    const saved = await saveToDatabase();
-    if (saved === false) {
-      btn.disabled = false;
-      btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>';
-      return;
-    }
-
-    const payload = getPayload();
-    const email = payload.client_email;
-
-    if (!email) {
-      showToast('Saved ✓ — add client email to also send agenda');
-    } else if (N8N_WEBHOOK_URL && N8N_WEBHOOK_URL !== 'YOUR_N8N_WEBHOOK_URL') {
-      try {
-        const res = await fetch(N8N_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          showToast('✓ Saved & email sent to ' + email);
-        } else {
-          showToast('Saved — email failed (' + res.status + ')');
-        }
-      } catch(e) {
-        showToast('Saved — could not reach n8n');
-        console.error(e);
-      }
-    }
-
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>';
-  }
-
   /* ── Save to Supabase (returns false on validation fail) ─── */
   async function saveToDatabase() {
     const payload = getPayload();
@@ -1331,6 +1286,10 @@
       return false;
     }
     const { error } = await db.from('kickoff_meetings').upsert(payload, { onConflict: 'client_name' });
+
+    const btn = document.getElementById('save-db-btn');
+    btn.disabled = false;
+    btn.innerHTML = uploadSVG();
 
     if (error) {
       showToast('Save failed — ' + error.message);
@@ -1458,7 +1417,7 @@
   /* ── localStorage ─────────────────────────────────────────── */
   const STORAGE_KEY = 'heaptrace_kickoff_agenda_v1';
   const FIELDS = [
-    'meta-client','meta-email','meta-date','meta-engagement',
+    'meta-client','meta-date','meta-engagement',
     'access-cloud','access-vcs','access-pm','access-comms','access-additional',
     'call-frequency','call-days','call-time','call-timezone',
     'priority-1','priority-2','priority-3','notes-aob'
